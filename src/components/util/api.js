@@ -1,6 +1,13 @@
+window.getUrlParms = function(name){
+    let reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    let r = window.location.search.substr(1).match(reg);
+    if(r!=null)
+        return unescape(r[2]);
+    return null;
+}
 
 window.addToken=function(obj){
-    var newObj=obj || {}
+    let newObj=obj || {}
     newObj.token=sessionStorage.getItem("token")
     return newObj
 }

@@ -32,8 +32,9 @@
             }
         },
         mounted(){
-            if(this.$route.query.token){
-                sessionStorage.setItem("token",this.$route.query.token)
+          let token=getUrlParms("token") || this.$route.query.token
+            if(token){
+                sessionStorage.setItem("token",token)
             }
             this.getCommon()
         }
