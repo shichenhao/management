@@ -1,0 +1,340 @@
+<template>
+    <div>
+        <el-form :inline="true" :model="searchParam" class="demo-form-inline">
+            <el-form-item>
+                <el-select v-model="searchParam.agentId" placeholder="代理商名称">
+                    <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="searchParam.name" placeholder="商户名称">
+                    <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="searchParam.state" placeholder="账户状态">
+                    <el-option v-for="item in list.status" :key="item.val" :label="item.name" :value="item.val"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" @click="onSearch()">查询</el-button>
+            </el-form-item>
+            <el-form-item style="float: right;">
+                <el-button type="primary" icon="el-icon-plus" @click="handleEdit()">新建</el-button>
+            </el-form-item>
+        </el-form>
+        <el-table
+            v-loading="searchLoading"
+            :data="tableData && tableData.list || []"
+            border
+            style="width: 100%">
+            <el-table-column
+                prop="id"
+                label="ID"
+                width="60"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                prop="agentName"
+                label="所属代理商">
+            </el-table-column>
+            <el-table-column
+                prop="address"
+                label="登录账户">
+            </el-table-column>
+            <el-table-column
+                prop="name"
+                label="商家名称">
+            </el-table-column>
+            <el-table-column
+                prop="multipartFile"
+                label="标识">
+            </el-table-column>
+            <el-table-column
+                prop="hasBinding"
+                label="是否关联已有商户"
+                width="140"
+                align="center">
+                <template slot-scope="scope">
+                    {{"是否关联已有商户".filtersHasBinding(scope.row.state)}}
+                </template>
+            </el-table-column>
+            <el-table-column
+                prop="state"
+                label="状态"
+                width="60"
+                align="center">
+                <template slot-scope="scope">
+                    {{"状态".filtersSatus(scope.row.state)}}
+                </template>
+            </el-table-column>
+            <el-table-column
+                prop="modifyTime"
+                label="更新时间"
+                min-width="110"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="操作">
+                <template slot-scope="scope">
+                    <el-button type="text" @click="handleEdit(scope.row.id)" size="small">编辑</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="pagination" v-if="tableData && tableData.total">
+            <el-pagination
+                @current-change="onSearch"
+                layout="prev, pager, next"
+                :page-size="20"
+                :total="tableData.total || 0">
+            </el-pagination>
+        </div>
+
+        <el-dialog title="商家" :visible.sync="dialogFormVisible">
+            <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
+                <el-form-item label="登录账号" prop="loginName" :label-width="formLabelWidth">
+                    <el-input v-model="addParam.loginName"></el-input>
+                </el-form-item>
+                <el-form-item label="登录密码" prop="loginPwd" :label-width="formLabelWidth">
+                    <el-input type="password" v-model="addParam.loginPwd"></el-input>
+                </el-form-item>
+                <el-form-item label="商户名称" prop="name" :label-width="formLabelWidth">
+                    <el-select v-model="addParam.name">
+                        <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="标识" :label-width="formLabelWidth">
+                    <el-input v-model="addParam.multipartFile"></el-input>
+                </el-form-item>
+                <el-form-item label="佣金抽取方式" :label-width="formLabelWidth">
+                    <el-select v-model="addParam.commissionType">
+                        <el-option v-for="item in list.commissionType" :key="item.val" :label="item.name" :value="item.val"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="佣金比例" prop="commissionRate" :label-width="formLabelWidth" v-if="addParam.commissionType=='1'">
+                    <el-input v-model="addParam.commissionRate"></el-input>
+                </el-form-item>
+                <el-form-item label="佣金固定金额" prop="commissionAmt" :label-width="formLabelWidth" v-if="addParam.commissionType=='2'">
+                    <el-input v-model="addParam.commissionAmt"></el-input>
+                </el-form-item>
+                <el-form-item label="关联已有账号" :label-width="formLabelWidth">
+                    <el-select v-model="addParam.hasBinding">
+                        <el-option v-for="item in list.hasBinding" :key="item.val" :label="item.name" :value="item.val"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="手机号" prop="mobile" :label-width="formLabelWidth">
+                    <el-input v-model="addParam.mobile"></el-input>
+                </el-form-item>
+                <el-form-item label="地址" prop="address" :label-width="formLabelWidth">
+                    <select class="sch_select" v-model="addParam.province" placeholder="省" @change="handleProvince('city','province')" style="width: 120px;float: left;">
+                        <option v-for="item in list.province" :key="item.id" :value="item.id">{{item.name}}</option>
+                    </select>
+                    <select class="sch_select" v-model="addParam.city" placeholder="市" @change="handleProvince('district','city')" style="width: 120px;float: left;margin:0 10px 15px;">
+                        <option v-for="item in list.city" :key="item.id" :value="item.id">{{item.name}}</option>
+                    </select>
+                    <select class="sch_select" v-model="addParam.district" placeholder="区" style="width: 120px;float: left;">
+                        <option v-for="item in list.district" :key="item.id" :value="item.id">{{item.name}}</option>
+                    </select>
+                    <el-input v-model="addParam.address"></el-input>
+                </el-form-item>
+                <el-form-item label="账户类型" :label-width="formLabelWidth">
+                    <el-select v-model="addParam.accountType">
+                        <el-option v-for="item in list.accountType" :key="item.val" :label="item.name" :value="item.val"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="银行名称" prop="bankName" :label-width="formLabelWidth">
+                    <el-input v-model="addParam.bankName"></el-input>
+                </el-form-item>
+                <el-form-item label="银行卡号" prop="bankCard" :label-width="formLabelWidth">
+                    <el-input v-model="addParam.bankCard"></el-input>
+                </el-form-item>
+                <el-form-item label="开户人" prop="bankPerson" :label-width="formLabelWidth">
+                    <el-input v-model="addParam.bankPerson"></el-input>
+                </el-form-item>
+                <el-form-item label="状态" :label-width="formLabelWidth">
+                    <el-select v-model="addParam.state" placeholder="请选择">
+                        <el-option v-for="item in list.status" :key="item.val" :label="item.name" :value="item.val"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="handleAdd('addParam')">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                dialogFormVisible: false,//新增修改弹窗
+                addLoading:false,//添加loading
+                searchLoading:false,//搜索loading
+                tableData: null,
+                list,
+                searchParam: {},
+                rules: {
+                    loginName: [
+                        { required: true, message: '请填写登录账号', trigger: 'change' }
+                    ],
+                    loginPwd: [
+                        { required: true, message: '请填写登录密码', trigger: 'change' }
+                    ],
+                    name: [
+                        { required: true, message: '请填写商户名称', trigger: 'change' }
+                    ],
+                    commissionRate: [
+                        { required: true, message: '请填写佣金比例', trigger: 'change' }
+                    ],
+                    commissionAmt: [
+                        { required: true, message: '请填写佣金金额', trigger: 'change' }
+                    ],
+                    mobile: [
+                        { required: true, message: '请填写手机号', trigger: 'change' }
+                    ],
+                    address: [
+                        { required: true, message: '请填写地址', trigger: 'change' }
+                    ],
+                    bankName: [
+                        { required: true, message: '请填写银行名称', trigger: 'change' }
+                    ],
+                    bankCard: [
+                        { required: true, message: '请填写银行卡号', trigger: 'change' }
+                    ],
+                    bankPerson: [
+                        { required: true, message: '请填写开户人', trigger: 'change' }
+                    ],
+                },
+                addParam:{
+                    accountName:'11',
+                    commissionType:1,
+                    accountType:1,
+                    hasBinding:1,
+                    state:1,
+                },
+                formLabelWidth: '120px'
+            }
+        },
+        methods: {
+            init(){
+                this.$axios.post('/express/manageClient/findExpressMerchantAndUser',addToken({id:1})).then((res)=>{
+                    console.log(res.data)
+                })
+            },
+            onSearch(start) {//搜索
+                this.searchLoading=true;
+                this.searchParam.start=start || 1
+                //console.log('搜索条件',this.searchParam);
+                this.$axios.post('/express/manageClient/findExpressMerchantList',addToken(this.searchParam)).then((res)=>{
+                    this.searchLoading=false
+                    //console.log(res.data.value)
+                    this.tableData=res.data.value
+                })
+            },// 创建成功后初始化数据
+            addInit(type){ // 创建成功后初始化数据
+                this.dialogFormVisible=type || false;
+                this.addParam={
+                    accountName:'11',
+                    commissionType:1,
+                    accountType:1,
+                    hasBinding:1,
+                    state:1,
+                }
+            },
+            handleAdd(formName) {//新增
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.addLoading=true
+                        console.log(this.addParam);
+                        delete this.addParam.merchantUserDTO
+                        this.$axios.post("/express/manageClient/createOrMergeExpressMerchant",addToken(this.addParam) ).then((res)=>{
+                            this.addLoading=false
+                            console.log(res.data,'创建成功')
+                            if(res.data.success){
+                                this.$message({
+                                    message: this.addParam.id ? '修改成功' : '创建成功',
+                                    type: 'success'
+                                });
+                                this.addInit()
+                                if(this.addParam.id){
+                                    this.onSearch()
+                                }
+                            }else{
+                                this.$message({
+                                    message: res.data.message,
+                                    type: 'success'
+                                });
+                            }
+                        }).catch((error)=>{
+                            this.addLoading=false
+                            this.$message.error(error.response.data.message);
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            handleProvince(type, parent, first){//省市区
+                if(first){
+                    this.addParam.province=window.list.province[0].id
+                }else{
+                    console.log(this.addParam.province)
+                }
+                this.$axios.post('/public/findRegionDataDTOList',{parentId:this.addParam[parent]}).then((res)=>{
+                  console.log(res.data)
+                    window.list[type]=res.data.value
+                    this.addParam[type]=this.addParam[type] ? this.addParam[type] : res.data.value[0].id
+                    if(res.data.value[0].level!==3){
+                        this.handleProvince('district','city')
+                    }
+                })
+            },
+            handleEdit(id) {//修改
+                this.addInit(true)
+                if(id){
+                    this.$axios.post('/express/manageClient/findExpressMerchantAndUser',addToken({id})).then((res)=>{
+                        this.addParam=Object.assign(res.data.value.merchantUserDTO,res.data.value)
+                        this.addParam.accountName='1'
+                        delete this.addParam.identityImg
+                        delete this.addParam.commissionAmt
+                        this.handleProvince('city','province')
+
+                    })
+                }else{
+                    this.handleProvince('city','province',true)
+                }
+            },
+            handleDistrict(id){
+                console.log(id)
+                this.addParam.district=478
+                console.log(this.addParam.district)
+            }
+        },
+        created(){
+            //this.init()
+        }
+    }
+</script>
+
+<style scoped>
+    .handle-box{
+        margin-bottom: 20px;
+    }
+    .handle-select{
+        width: 120px;
+    }
+    .handle-input{
+        width: 300px;
+        display: inline-block;
+    }
+    .sch_select{
+        width: 170px;
+        border-radius:4px;
+        border:1px solid #dcdfe6;
+        height: 38px;
+        color: #606266;
+        padding: 0 10px;
+    }
+</style>
