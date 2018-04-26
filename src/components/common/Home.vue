@@ -32,10 +32,10 @@
             }
         },
         mounted(){
-            this.getCommon()
             if(this.$route.query.token){
                 sessionStorage.setItem("token",this.$route.query.token)
             }
+            this.getCommon()
         }
     }
 </script>
