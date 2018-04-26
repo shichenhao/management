@@ -59,7 +59,7 @@
                 <el-form-item label="广告图片文件" prop="multipartFile" :label-width="formLabelWidth">
                     <el-upload
                         class="upload-demo"
-                        action="/public/upLoadFile"
+                        action="/express/public/upLoadFile"
                         :headers="{'Content-Type':'multipart/form-data'}"
                         :on-preview="handlePreview"
                         :on-remove="handleRemove"
