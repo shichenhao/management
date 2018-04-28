@@ -24,7 +24,7 @@ instance.defaults.transformRequest = [function (data) {
     return newData
 }]
 instance.interceptors.request.use(function (config) {
-    config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    config.headers['Content-Type'] = 'multipart/form-data'
     return config
 })
 

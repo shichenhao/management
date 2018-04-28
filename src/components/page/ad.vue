@@ -55,6 +55,14 @@
         </div>
 
         <el-dialog title="广告" :visible.sync="dialogFormVisible">
+            <form action="/express/public/upLoadFile" id="form" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file">
+            </form>
+            <input type="button" value="上传" @click="onUpload">
+
+
+            <input type="file" value=""  id="file"  @change='onUpload'>
+
             <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
                 <el-form-item label="广告图片文件" prop="multipartFile" :label-width="formLabelWidth">
                     <el-upload
@@ -180,6 +188,14 @@
                     })
                 }
             },
+            onUpload(e){
+                let param = new FormData(document.getElementById("form")); //创建form对象
+                this.$axios.post('/express/public/upLoadFile',param)
+                    .then(response=>{
+                        console.log(response.data);
+                    })
+
+            }
         }
     }
 </script>
