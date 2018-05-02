@@ -211,6 +211,9 @@
                   }
                 })
             }
+        },
+        created(){
+            this.onSearch()
         }
     }
 </script>

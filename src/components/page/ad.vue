@@ -57,6 +57,7 @@
         <el-dialog title="广告" :visible.sync="dialogFormVisible">
             <form action="/express/public/upLoadFile" id="form" method="POST" enctype="multipart/form-data">
                 <input type="file" name="file">
+                <input type="submit" value="上传">
             </form>
             <input type="button" value="上传" @click="onUpload">
 
@@ -196,6 +197,9 @@
                     })
 
             }
+        },
+        created(){
+            this.onSearch()
         }
     }
 </script>

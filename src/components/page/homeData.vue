@@ -200,6 +200,9 @@
                     })
                 }
             },
+        },
+        created(){
+            this.onSearch()
         }
     }
 </script>

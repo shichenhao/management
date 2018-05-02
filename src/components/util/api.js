@@ -9,12 +9,14 @@ window.getUrlParms = function(name){
 window.addToken=function(obj){
     let newObj=obj || {}
     newObj.token=sessionStorage.getItem("token")
+    console.log(newObj)
     return newObj
 }
 
 import axios from 'axios';
 
 const instance = axios.create({})
+const multipart = axios.create({})
 
 instance.defaults.transformRequest = [function (data) {
     let newData = ''
@@ -23,11 +25,11 @@ instance.defaults.transformRequest = [function (data) {
     }
     return newData
 }]
-instance.interceptors.request.use(function (config) {
+multipart.interceptors.request.use(function (config) {
     config.headers['Content-Type'] = 'multipart/form-data'
     return config
 })
 
 export {
-    instance
+    instance, multipart
 }

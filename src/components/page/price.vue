@@ -118,6 +118,17 @@
 </template>
 
 <script>
+    import { number } from './../../assets/validate'
+    let addPrice=(rule, value,callback)=>{
+        console.log(value)
+        if (!value){
+            callback(new Error('请输入电话号码'))
+        }else if (!number(value)){
+            callback(new Error('请输入正确的11位手机号码'))
+        }else {
+            callback()
+        }
+    }
     export default {
         data() {
             return {
@@ -152,9 +163,8 @@
                         { type: 'number', message: '请输入正确的基础价格'}
                     ],
                     addPrice: [
-                        { required: true, message: '请填写超出每公斤加价'},
-                        { type: 'number', message: '请输入正确的价格'}
-                        //{ type: 'number', pattern: /^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/ , message: '请输入正确的价格'}
+                        //{ type: 'number', message: '请输入正确的价格'}
+                        { required: true, trigger: 'blur', validator: addPrice}
                     ],
                     weight: [
                         { required: true, message: '请填写基础重量'},
@@ -228,6 +238,9 @@
                     })
                 }
             },
+        },
+        created(){
+            this.onSearch()
         }
     }
 </script>

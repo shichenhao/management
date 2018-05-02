@@ -121,6 +121,7 @@
                     <el-select v-model="addParam.hasBinding">
                         <el-option v-for="item in list.hasBinding" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
+                    <el-input v-if="addParam.hasBinding" v-model="addParam.accountName"></el-input>
                 </el-form-item>
                 <el-form-item label="手机号" prop="mobile" :label-width="formLabelWidth">
                     <el-input v-model="addParam.mobile"></el-input>
@@ -208,7 +209,7 @@
                     ],
                 },
                 addParam:{
-                    accountName:'11',
+                    accountName:null,
                     commissionType:1,
                     accountType:1,
                     hasBinding:1,
@@ -313,7 +314,7 @@
             }
         },
         created(){
-            //this.init()
+            this.onSearch()
         }
     }
 </script>
