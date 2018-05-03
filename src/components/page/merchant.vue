@@ -47,7 +47,7 @@
                 label="商家名称">
             </el-table-column>
             <el-table-column
-                prop="multipartFile"
+                prop="identityImg"
                 label="标识">
             </el-table-column>
             <el-table-column
@@ -62,7 +62,7 @@
             <el-table-column
                 prop="state"
                 label="状态"
-                width="60"
+                width="80"
                 align="center">
                 <template slot-scope="scope">
                     {{"状态".filtersSatus(scope.row.state)}}
@@ -71,11 +71,13 @@
             <el-table-column
                 prop="modifyTime"
                 label="更新时间"
-                min-width="110"
+                min-width="200"
                 align="center">
             </el-table-column>
             <el-table-column
-                label="操作">
+                label="操作"
+                width="60"
+                align="center">
                 <template slot-scope="scope">
                     <el-button type="text" @click="handleEdit(scope.row.id)" size="small">编辑</el-button>
                 </template>
@@ -99,12 +101,13 @@
                     <el-input type="password" v-model="addParam.loginPwd"></el-input>
                 </el-form-item>
                 <el-form-item label="商户名称" prop="name" :label-width="formLabelWidth">
-                    <el-select v-model="addParam.name">
-                        <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
-                    </el-select>
+                    <el-input v-model="addParam.name"></el-input>
                 </el-form-item>
                 <el-form-item label="标识" :label-width="formLabelWidth">
-                    <el-input v-model="addParam.multipartFile"></el-input>
+                    <label class="adFile">
+                        上传图片
+                        <input class="file" name="file" type="file" accept="image/png,image/gif,image/jpeg" @change="update"/>
+                    </label>
                 </el-form-item>
                 <el-form-item label="佣金抽取方式" :label-width="formLabelWidth">
                     <el-select v-model="addParam.commissionType">
@@ -121,12 +124,14 @@
                     <el-select v-model="addParam.hasBinding">
                         <el-option v-for="item in list.hasBinding" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
-                    <el-input v-if="addParam.hasBinding" v-model="addParam.accountName"></el-input>
                 </el-form-item>
-                <el-form-item label="手机号" prop="mobile" :label-width="formLabelWidth">
+                <el-form-item label="账户名称" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
+                    <el-input v-model="addParam.accountName"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" prop="mobile" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
                     <el-input v-model="addParam.mobile"></el-input>
                 </el-form-item>
-                <el-form-item label="地址" prop="address" :label-width="formLabelWidth">
+                <el-form-item label="地址" prop="address" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
                     <select class="sch_select" v-model="addParam.province" placeholder="省" @change="handleProvince('city','province')" style="width: 120px;float: left;">
                         <option v-for="item in list.province" :key="item.id" :value="item.id">{{item.name}}</option>
                     </select>
@@ -138,18 +143,18 @@
                     </select>
                     <el-input v-model="addParam.address"></el-input>
                 </el-form-item>
-                <el-form-item label="账户类型" :label-width="formLabelWidth">
+                <el-form-item label="账户类型" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
                     <el-select v-model="addParam.accountType">
                         <el-option v-for="item in list.accountType" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="银行名称" prop="bankName" :label-width="formLabelWidth">
+                <el-form-item label="银行名称" prop="bankName" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
                     <el-input v-model="addParam.bankName"></el-input>
                 </el-form-item>
-                <el-form-item label="银行卡号" prop="bankCard" :label-width="formLabelWidth">
+                <el-form-item label="银行卡号" prop="bankCard" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
                     <el-input v-model="addParam.bankCard"></el-input>
                 </el-form-item>
-                <el-form-item label="开户人" prop="bankPerson" :label-width="formLabelWidth">
+                <el-form-item label="开户人" prop="bankPerson" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
                     <el-input v-model="addParam.bankPerson"></el-input>
                 </el-form-item>
                 <el-form-item label="状态" :label-width="formLabelWidth">
@@ -226,7 +231,7 @@
             },
             onSearch(start) {//搜索
                 this.searchLoading=true;
-                this.searchParam.start=start || 1
+                this.searchParam.start=((start-1)*20) || 0
                 //console.log('搜索条件',this.searchParam);
                 this.$axios.post('/express/manageClient/findExpressMerchantList',addToken(this.searchParam)).then((res)=>{
                     this.searchLoading=false
@@ -237,10 +242,9 @@
             addInit(type){ // 创建成功后初始化数据
                 this.dialogFormVisible=type || false;
                 this.addParam={
-                    accountName:'11',
                     commissionType:1,
                     accountType:1,
-                    hasBinding:1,
+                    hasBinding:0,
                     state:1,
                 }
             },
@@ -248,8 +252,28 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.addLoading=true
-                        console.log(this.addParam);
                         delete this.addParam.merchantUserDTO
+
+                        if(this.addParam.commissionType==1){
+                            delete this.addParam.commissionAmt
+                        }else{
+                            delete this.addParam.commissionRate
+                        }
+
+                        if(this.addParam.hasBinding==1){
+                            delete this.addParam.accountName
+                            delete this.addParam.mobile
+                            delete this.addParam.address
+                            delete this.addParam.bankName
+                            delete this.addParam.bankCard
+                            delete this.addParam.bankPerson
+                            delete this.addParam.accountType
+                            delete this.addParam.province
+                            delete this.addParam.city
+                            delete this.addParam.district
+                        }
+
+
                         this.$axios.post("/express/manageClient/createOrMergeExpressMerchant",addToken(this.addParam) ).then((res)=>{
                             this.addLoading=false
                             console.log(res.data,'创建成功')
@@ -278,15 +302,16 @@
                 });
             },
             handleProvince(type, parent, first){//省市区
+                //console.log(type, parent, first)
                 if(first){
                     this.addParam.province=window.list.province[0].id
                 }else{
                     console.log(this.addParam.province)
                 }
-                this.$axios.post('/public/findRegionDataDTOList',{parentId:this.addParam[parent]}).then((res)=>{
-                  console.log(res.data)
+                this.$axios.post('/express/public/findRegionDataDTOList',{parentId:this.addParam[parent]}).then((res)=>{
+                    console.log(type, res.data)
                     window.list[type]=res.data.value
-                    this.addParam[type]=this.addParam[type] ? this.addParam[type] : res.data.value[0].id
+                    this.addParam[type]=res.data.value[0].id
                     if(res.data.value[0].level!==3){
                         this.handleProvince('district','city')
                     }
@@ -294,10 +319,14 @@
             },
             handleEdit(id) {//修改
                 this.addInit(true)
+                if(this.$refs['addParam']!==undefined){
+                    this.$refs['addParam'].resetFields();
+                }
                 if(id){
+                    this.addLoading = true;
                     this.$axios.post('/express/manageClient/findExpressMerchantAndUser',addToken({id})).then((res)=>{
+                        this.addLoading = false;
                         this.addParam=Object.assign(res.data.value.merchantUserDTO,res.data.value)
-                        this.addParam.accountName='1'
                         delete this.addParam.identityImg
                         delete this.addParam.commissionAmt
                         this.handleProvince('city','province')
@@ -311,7 +340,21 @@
                 console.log(id)
                 this.addParam.district=478
                 console.log(this.addParam.district)
-            }
+            },
+            update(e){
+                this.addLoading = true;
+                this.file=e.target.files[0];
+                let formData = new FormData();
+                formData.append('file', this.file)
+                this.multipart.post('/express/public/upLoadFile', formData)
+                    .then(res => {
+                        this.addLoading = false;
+                        if(res.data.success){
+                            this.$message.success('上传成功');
+                            this.addParam.multipartFile=res.data.value
+                        }
+                    })
+            },
         },
         created(){
             this.onSearch()

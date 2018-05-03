@@ -9,14 +9,15 @@ window.getUrlParms = function(name){
 window.addToken=function(obj){
     let newObj=obj || {}
     newObj.token=sessionStorage.getItem("token")
-    console.log(newObj)
+    //console.log(newObj)
     return newObj
 }
 
 import axios from 'axios';
 
 const instance = axios.create({})
-const multipart = axios.create({})
+const multipart = axios.create({
+    withCredentials: true})
 
 instance.defaults.transformRequest = [function (data) {
     let newData = ''

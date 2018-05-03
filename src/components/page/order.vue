@@ -19,7 +19,7 @@
             </el-form-item>
             <el-form-item>
                 <el-select v-model="searchParam.status" placeholder="订单状态">
-                    <el-option v-for="item in list.status" :key="item.val" :label="item.name" :value="item.val"></el-option>
+                    <el-option v-for="item in list.orderStatus" :key="item.val" :label="item.name" :value="item.val"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item>
@@ -44,7 +44,7 @@
                 <el-button type="primary" icon="el-icon-search" @click="onSearch()">查询</el-button>
             </el-form-item>
         </el-form>
-        <el-form>
+        <el-form style="padding: 0 0 20px">
             <el-button type="primary" :disabled="!multipleSelection.length" icon="el-icon-news" @click="clearOrder()">取件</el-button>
         </el-form>
         <el-table
@@ -58,17 +58,19 @@
                 type="selection"
                 width="55"
                 align="center"
+                :selectable="selectable"
             >
             </el-table-column>
             <el-table-column
                 label="订单号"
-                prop="orderId"
-                width="120">
+                prop="id"
+                width="160"
+                align="center">
             </el-table-column>
             <el-table-column
                 label="代理商"
                 prop="agentName"
-                width="120">
+                min-width="120">
             </el-table-column>
             <el-table-column
                 label="所属商家"
@@ -77,60 +79,80 @@
             </el-table-column>
             <el-table-column
                 label="发货人"
-                prop="name"
-                width="120">
+                prop="consignerName"
+                width="120"
+                align="center">
             </el-table-column>
             <el-table-column
                 label="发货地址"
-                prop="consignerProvinceName"
-                width="120">
+                prop="consignerAddress"
+                width="120"
+                align="center">
             </el-table-column>
             <el-table-column
                 label="收货人"
-                prop="name"
-                width="120">
+                prop="consigneeName"
+                width="100"
+                align="center">
             </el-table-column>
             <el-table-column
                 label="收货地址"
-                prop="consigneeProvinceName"
-                width="120">
+                prop="consigneeAddress"
+                width="120"
+                align="center">
             </el-table-column>
             <el-table-column
                 label="取件时间"
                 prop="modifyTime"
-                width="120">
+                width="110"
+                align="center">
             </el-table-column>
             <el-table-column
                 label="订单状态"
                 prop="name"
-                width="120">
+                width="100"
+                align="center">
                 <template slot-scope="scope">
-                    {{"状态".filtersSatus(scope.row.state)}}
+                    {{"状态".filtersOrders(scope.row.status)}}
                 </template>
             </el-table-column>
-            <el-table-column
+            <!--<el-table-column
                 label="备注"
-                prop="name">
+                width="120"
+                prop="remark">
             </el-table-column>
             <el-table-column
                 label="快递公司"
-                prop="name"
-                width="120">
+                prop="expressMerchantName"
+                width="120"
+                align="center">
             </el-table-column>
             <el-table-column
                 label="费用预估"
-                prop="name"
-                width="120">
+                prop="totalPrice"
+                width="100"
+                align="center">
             </el-table-column>
             <el-table-column
                 label="付款金额"
-                prop="name"
-                width="120">
+                prop="price"
+                width="100"
+                align="center">
             </el-table-column>
             <el-table-column
                 label="系统收益"
-                prop="name"
-                width="120">
+                prop="sysRateAmt"
+                width="100"
+                align="center">
+            </el-table-column>-->
+            <el-table-column
+                label="操作"
+                width="100"
+                align="center">
+                <template slot-scope="scope">
+                    <el-button type="text" v-if="scope.row.status === 0 || scope.row.status === 1" @click="cancelOrder(scope.row.id)" size="small">取消订单</el-button>
+                    <el-button type="text" v-if="scope.row.status === -1" @click="lookOrder(scope.row.cancelReason)" size="small">查看取消原因</el-button>
+                </template>
             </el-table-column>
         </el-table>
         <div class="pagination" v-if="tableData && tableData.total">
@@ -188,7 +210,7 @@
         methods: {
             onSearch(start) {//搜索
                 this.searchLoading=true;
-                this.searchParam.start=start || 1
+                this.searchParam.start=((start-1)*20) || 0
                 if(this.searchParam.data){
                     this.searchParam.startTime=this.searchParam.data[0]
                     this.searchParam.endTime=this.searchParam.data[1]
@@ -204,12 +226,39 @@
                 this.multipleSelection = val;
             },
             clearOrder(id) {//取件
+                let ids = this.multipleSelection.map(item=> item.id).toString();
                 this.dialogFormVisible=true
-                this.$axios.post('/express/manageClient/batchDoneExpressOrder',addToken(this.multipleSelection)).then((res)=>{
+                this.$axios.post('/express/manageClient/batchDoneExpressOrder',addToken({ids})).then((res)=>{
                   if(res.data.success){
                     this.onSearch()
                   }
+                }).catch((error)=>{
+                    this.$message.error(error.response.data.message);
                 })
+            },
+            cancelOrder(id) {//取消订单
+                console.log(id)
+                this.dialogFormVisible=true
+                this.$axios.post('/express/manageClient/cancelExpressOrder',addToken({id})).then((res)=>{
+                  if(res.data.success){
+                    this.onSearch()
+                  }
+                }).catch((error)=>{
+                    this.$message.error(error.response.data.message);
+                })
+            },
+            lookOrder(txt){ // 查看取消原因
+                this.$alert(txt , '取消原因', {
+                    confirmButtonText: '确定'
+                });
+            },
+            selectable(row){
+                if(row.status === 2){
+                    return true
+                }else{
+                    return false
+                }
+
             }
         },
         created(){

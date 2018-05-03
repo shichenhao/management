@@ -32,14 +32,23 @@
             </el-table-column>
             <el-table-column
                 prop="imgUrl"
-                label="图片">
+                label="图片"
+                min-width="120"
+                align="center">
+                <template slot-scope="scope">
+                    <img :src="scope.row.imgUrl" alt="">
+                </template>
             </el-table-column>
             <el-table-column
                 prop="modifyTime"
-                label="更新时间">
+                label="更新时间"
+                min-width="200"
+                align="center">
             </el-table-column>
             <el-table-column
-                label="操作">
+                label="操作"
+                min-width="60"
+                align="center">
                 <template slot-scope="scope">
                     <el-button type="text" @click="handleEdit(scope.row.id)" size="small">编辑</el-button>
                 </template>
@@ -55,29 +64,12 @@
         </div>
 
         <el-dialog title="广告" :visible.sync="dialogFormVisible">
-            <form action="/express/public/upLoadFile" id="form" method="POST" enctype="multipart/form-data">
-                <input type="file" name="file">
-                <input type="submit" value="上传">
-            </form>
-            <input type="button" value="上传" @click="onUpload">
-
-
-            <input type="file" value=""  id="file"  @change='onUpload'>
-
             <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
-                <el-form-item label="广告图片文件" prop="multipartFile" :label-width="formLabelWidth">
-                    <el-upload
-                        class="upload-demo"
-                        action="/express/public/upLoadFile"
-                        :headers="{'Content-Type':'multipart/form-data'}"
-                        :on-preview="handlePreview"
-                        :on-remove="handleRemove"
-                        :before-remove="beforeRemove"
-                        :limit="1"
-                        :on-exceed="handleExceed"
-                        :file-list="fileList">
-                        <el-button size="small" type="primary">点击上传</el-button>
-                    </el-upload>
+                <el-form-item label="跳转地址" prop="gotoUrl" :label-width="formLabelWidth">
+                    <label class="adFile">
+                        上传图片
+                        <input class="file" name="file" type="file" accept="image/png,image/gif,image/jpeg" @change="update"/>
+                    </label>
                 </el-form-item>
                 <el-form-item label="跳转地址" prop="gotoUrl" :label-width="formLabelWidth">
                     <el-input v-model="addParam.gotoUrl"></el-input>
@@ -125,18 +117,6 @@
             }
         },
         methods: {
-            handleRemove(file, fileList) {
-                console.log(file, fileList);
-            },
-            handlePreview(file) {
-                console.log(file);
-            },
-            handleExceed(files, fileList) {
-                this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
-            },
-            beforeRemove(file, fileList) {
-                return this.$confirm(`确定移除 ${ file.name }？`);
-            },
             addInit(type){ // 创建成功后初始化数据
                 this.dialogFormVisible=type || false;
                 this.addParam={};
@@ -146,7 +126,7 @@
             },
             onSearch(start) {//搜索
                 this.searchLoading=true;
-                this.searchParam.start=start || 1
+                this.searchParam.start=((start-1)*20) || 0
                 //console.log('搜索条件',this.searchParam);
                 this.$axios.post("/express/manageClient/findExpressBannerListByPage",addToken(this.searchParam)).then((res)=>{
                     this.searchLoading=false;
@@ -181,22 +161,33 @@
                 });
             },
             handleEdit(id) {//修改
-                this.addInit(true)
+                this.addInit(true);
+                if(this.$refs['addParam']!==undefined){
+                    this.$refs['addParam'].resetFields();
+                }
                 if(id){
+                    this.addLoading = true;
                     this.$axios.post('/express/manageClient/findExpressBanner',addToken({id})).then((res)=>{
+                        this.addLoading = false;
                         console.log(res.data)
                         this.addParam=res.data.value
                     })
                 }
             },
-            onUpload(e){
-                let param = new FormData(document.getElementById("form")); //创建form对象
-                this.$axios.post('/express/public/upLoadFile',param)
-                    .then(response=>{
-                        console.log(response.data);
+            update(e){
+                this.addLoading = true;
+                this.file=e.target.files[0];
+                let formData = new FormData();
+                formData.append('file', this.file)
+                this.multipart.post('/express/public/upLoadFile', formData)
+                    .then(res => {
+                        this.addLoading = false;
+                        if(res.data.success){
+                            this.$message.success('上传成功');
+                            this.addParam.imgUrl=res.data.value
+                        }
                     })
-
-            }
+            },
         },
         created(){
             this.onSearch()

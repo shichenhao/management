@@ -61,6 +61,30 @@ String.prototype.filtersHasBinding=function(state){
     }
     return text
 }
+String.prototype.filtersOrders=function(state){
+    let text=''
+    switch (state){
+        case -1:
+            text='已取消'
+            break
+        case 0:
+            text='创建订单'
+            break
+        case 1:
+            text='待付款'
+            break
+        case 2:
+            text='代取件'
+            break
+        case 3:
+            text='已完成'
+            break
+        default:
+            text = ''
+            break
+    }
+    return text
+}
 String.prototype.filtersHasBinding=function(state){
     let text=''
     switch (state){
@@ -115,6 +139,22 @@ window.list={
     }, {
         name:'停用',
         val:0
+    }],
+    orderStatus:[{
+        name:'已取消',
+        val:-1
+    }, {
+        name:'创建订单',
+        val:0
+    }, {
+        name:'待付款',
+        val:1
+    }, {
+        name:'代取件',
+        val:2
+    }, {
+        name:'已完成',
+        val:3
     }],
     hasBinding :[{
         name:'是',

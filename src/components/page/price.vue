@@ -35,30 +35,44 @@
             </el-table-column>
             <el-table-column
                 prop="consignerProvinceName"
-                label="发货地区">
+                label="发货地区"
+                width="120"
+                align="center">
             </el-table-column>
             <el-table-column
                 prop="consigneeProvinceName"
-                label="收货地区">
+                label="收货地区"
+                width="120"
+                align="center">
             </el-table-column>
             <el-table-column
                 prop="price"
-                label="基础价格">
+                label="基础价格"
+                width="100"
+                align="center">
             </el-table-column>
             <el-table-column
                 prop="weight"
-                label="基础重量">
+                label="基础重量"
+                width="100"
+                align="center">
             </el-table-column>
             <el-table-column
                 prop="addPrice"
-                label="超出每公斤加价">
+                label="超出每公斤加价"
+                width="120"
+                align="center">
             </el-table-column>
             <el-table-column
                 prop="modifyTime"
-                label="更新时间">
+                label="更新时间"
+                width="200"
+                align="center">
             </el-table-column>
             <el-table-column
-                label="操作">
+                label="操作"
+                width="60"
+                align="center">
                 <template slot-scope="scope">
                     <el-button type="text" @click="handleEdit(scope.row.id)" size="small">编辑</el-button>
                 </template>
@@ -118,17 +132,6 @@
 </template>
 
 <script>
-    import { number } from './../../assets/validate'
-    let addPrice=(rule, value,callback)=>{
-        console.log(value)
-        if (!value){
-            callback(new Error('请输入电话号码'))
-        }else if (!number(value)){
-            callback(new Error('请输入正确的11位手机号码'))
-        }else {
-            callback()
-        }
-    }
     export default {
         data() {
             return {
@@ -163,11 +166,11 @@
                         { type: 'number', message: '请输入正确的基础价格'}
                     ],
                     addPrice: [
-                        //{ type: 'number', message: '请输入正确的价格'}
-                        { required: true, trigger: 'blur', validator: addPrice}
+                        { required: true, message: '请输入超出每公斤加价',},
+                        { type: 'number', message: '请输入正确的价格'}
                     ],
                     weight: [
-                        { required: true, message: '请填写基础重量'},
+                        { required: true, message: '请输入基础重量'},
                         { type: 'number', message: '请输入正确的基础重量'}
                     ],
                 },
@@ -197,6 +200,7 @@
                             this.addLoading=false
                             console.log(res.data,'创建成功')
                             if(res.data.success){
+                                this.$refs['addParam'].resetFields()
                                 this.$message({
                                     message: this.addParam.id ? '修改成功' : '创建成功',
                                     type: 'success'
@@ -222,7 +226,7 @@
             },
             onSearch(start) {//搜索
                 this.searchLoading=true;
-                this.searchParam.start=start || 1
+                this.searchParam.start=((start-1)*20) || 0
                 //console.log('搜索条件',this.searchParam);
                 this.$axios.post("/express/manageClient/findExpressPriceList",addToken(this.searchParam) ).then((res)=>{
                     this.searchLoading=false;
@@ -232,8 +236,13 @@
             },
             handleEdit(id) {//修改
                 this.addInit(true)
+                if(this.$refs['addParam']!==undefined){
+                    this.$refs['addParam'].resetFields();
+                }
                 if(id){
+                    this.addLoading = true;
                     this.$axios.post('/express/manageClient/findExpressPrice',addToken({id})).then((res)=>{
+                        this.addLoading = false;
                         this.addParam=res.data.value
                     })
                 }

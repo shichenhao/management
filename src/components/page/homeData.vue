@@ -31,7 +31,7 @@
             <el-table-column
                 prop="agentName"
                 label="所属代理商"
-                width="180">
+                min-width="180">
             </el-table-column>
             <el-table-column
                 prop="expressMerchantName"
@@ -39,7 +39,9 @@
             </el-table-column>
             <el-table-column
                 prop="serviceDay"
-                label="服务日期">
+                label="服务日期"
+                width="100"
+                align="center">
                 <template slot-scope="scope">
                     {{"状态".filtersDay(scope.row.serviceDay)}}
                 </template>
@@ -62,10 +64,14 @@
             </el-table-column>
             <el-table-column
                 prop="modifyTime"
-                label="更新时间">
+                label="更新时间"
+                min-width="200"
+                align="center">
             </el-table-column>
             <el-table-column
-                label="操作">
+                label="操作"
+                width="60"
+                align="center">
                 <template slot-scope="scope">
                     <el-button type="text" @click="handleEdit(scope.row.id)" size="small">编辑</el-button>
                 </template>
@@ -157,7 +163,7 @@
             },
             onSearch(start) {//搜索
                 this.searchLoading=true;
-                this.searchParam.start=start || 1
+                this.searchParam.start=((start-1)*20) || 0
                 //console.log('搜索条件',this.searchParam);
                 this.$axios.post("/express/manageClient/findExpressTimeListByPage",addToken(this.searchParam)).then((res)=>{
                     this.searchLoading=false;
@@ -193,8 +199,13 @@
             },
             handleEdit(id) {//修改
                 this.addInit(true)
+                if(this.$refs['addParam']!==undefined){
+                    this.$refs['addParam'].resetFields();
+                }
                 if(id){
+                    this.addLoading = true;
                     this.$axios.post('/express/manageClient/findExpressTime',addToken({id})).then((res)=>{
+                        this.addLoading = false;
                         console.log(res.data)
                         this.addParam=res.data.value
                     })
