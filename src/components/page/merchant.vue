@@ -174,6 +174,35 @@
 <script>
     export default {
         data() {
+            let telValidata = (rule, value, callback) => {
+                let reg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+                if(!value || value == ''){
+                    callback(new Error('请输入手机号'));
+                }else if(value.length!=11 || !reg.test(value)){
+                    callback(new Error('请输入正确的手机号'));
+                }else{
+                    callback();
+                }
+            };
+            let commissionRateValidata = (rule, value, callback) => {
+                if(!value || value == ''){
+                    callback(new Error('请填写佣金比例'));
+                }else if(value>100){
+                    callback(new Error('佣金比例不能大于100'));
+                }else{
+                    callback();
+                }
+            };
+            let commissionAmtValidata = (rule, value, callback) => {
+                let reg = /^(?:(?:(?:[1-9]\d{0,2}(?:,\d{3})*)|[1-9]\d*|0))(?:\.\d{1,2})?$/;
+                if(!value || value == ''){
+                    callback(new Error('请填写佣金金额'));
+                }else if(!reg.test(value)){
+                    callback(new Error('请填写正确的佣金金额'));
+                }else{
+                    callback();
+                }
+            };
             return {
                 dialogFormVisible: false,//新增修改弹窗
                 addLoading:false,//添加loading
@@ -192,13 +221,13 @@
                         { required: true, message: '请填写商户名称', trigger: 'change' }
                     ],
                     commissionRate: [
-                        { required: true, message: '请填写佣金比例', trigger: 'change' }
+                        { required: true, validator: commissionRateValidata,  trigger: 'blur' }
                     ],
                     commissionAmt: [
-                        { required: true, message: '请填写佣金金额', trigger: 'change' }
+                        { required: true, validator: commissionAmtValidata,  trigger: 'blur' }
                     ],
                     mobile: [
-                        { required: true, message: '请填写手机号', trigger: 'change' }
+                        { required: true, validator: telValidata,  trigger: 'blur' }
                     ],
                     address: [
                         { required: true, message: '请填写地址', trigger: 'change' }
@@ -214,6 +243,7 @@
                     ],
                 },
                 addParam:{
+                    mobile:null,
                     accountName:null,
                     commissionType:1,
                     accountType:1,
@@ -224,6 +254,7 @@
             }
         },
         methods: {
+
             init(){
                 this.$axios.post('/express/manageClient/findExpressMerchantAndUser',addToken({id:1})).then((res)=>{
                     console.log(res.data)
@@ -244,7 +275,7 @@
                 this.addParam={
                     commissionType:1,
                     accountType:1,
-                    hasBinding:0,
+                    hasBinding:1,
                     state:1,
                 }
             },
@@ -309,7 +340,7 @@
                     console.log(this.addParam.province)
                 }
                 this.$axios.post('/express/public/findRegionDataDTOList',{parentId:this.addParam[parent]}).then((res)=>{
-                    console.log(type, res.data)
+                    //console.log(type, res.data)
                     window.list[type]=res.data.value
                     this.addParam[type]=res.data.value[0].id
                     if(res.data.value[0].level!==3){
@@ -318,6 +349,7 @@
                 })
             },
             handleEdit(id) {//修改
+                console.log(this.addParam.hasBinding)
                 this.addInit(true)
                 if(this.$refs['addParam']!==undefined){
                     this.$refs['addParam'].resetFields();

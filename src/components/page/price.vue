@@ -107,17 +107,17 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="基础价格" prop="price" :label-width="formLabelWidth" style="width: 300px">
-                    <el-input v-model.number="addParam.price" form="number">
+                    <el-input v-model="addParam.price" form="number">
                         <template slot="append">元</template>
                     </el-input>
                 </el-form-item>
                 <el-form-item label="基础重量" prop="weight" :label-width="formLabelWidth" style="width: 280px">
-                    <el-input v-model.number="addParam.weight">
+                    <el-input v-model="addParam.weight">
                         <template slot="append">公斤</template>
                     </el-input>
                 </el-form-item>
                 <el-form-item label="超出每公斤加价" prop="addPrice" :label-width="formLabelWidth" style="width: 350px">
-                    <el-input v-model.number="addParam.addPrice">
+                    <el-input v-model="addParam.addPrice">
                         <template slot="append">元</template>
                     </el-input>
                 </el-form-item>
@@ -134,6 +134,18 @@
 <script>
     export default {
         data() {
+            let commissionAmtValidata = (rule, value, callback) => {
+                let err = rule.field== 'weight' ? '重量' : '价格'
+
+                let reg = /^(?:(?:(?:[1-9]\d{0,2}(?:,\d{3})*)|[1-9]\d*|0))(?:\.\d{1,2})?$/;
+                if(!value || value == ''){
+                    callback(new Error('请填写' + err));
+                }else if(!reg.test(value)){
+                    callback(new Error('请输入正确的' + err));
+                }else{
+                    callback();
+                }
+            };
             return {
                 dialogFormVisible: false,//新增修改弹窗
                 addLoading:false,//添加loading
@@ -162,16 +174,13 @@
                         { required: true, message: '请选收货地区', trigger: 'change' }
                     ],
                     price: [
-                        { required: true, message: '请填写基础价格'},
-                        { type: 'number', message: '请输入正确的基础价格'}
+                        { required: true, validator: commissionAmtValidata,  trigger: 'change' }
                     ],
                     addPrice: [
-                        { required: true, message: '请输入超出每公斤加价',},
-                        { type: 'number', message: '请输入正确的价格'}
+                        { required: true, validator: commissionAmtValidata,  trigger: 'change' }
                     ],
                     weight: [
-                        { required: true, message: '请输入基础重量'},
-                        { type: 'number', message: '请输入正确的基础重量'}
+                        { required: true, validator: commissionAmtValidata,  trigger: 'change' }
                     ],
                 },
                 formLabelWidth: '140px'
