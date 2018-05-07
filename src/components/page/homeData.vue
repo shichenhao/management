@@ -1,17 +1,6 @@
 <template>
     <div>
         <el-form :inline="true" :model="searchParam" class="demo-form-inline">
-            <el-select v-model="searchParam.agentId" placeholder="代理商名称">
-                <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
-            </el-select>
-            <el-form-item>
-                <el-select v-model="searchParam.merchantId" placeholder="商户名称">
-                    <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="onSearch()">查询</el-button>
-            </el-form-item>
             <el-form-item style="float: right;">
                 <el-button type="primary" icon="el-icon-plus" @click="handleEdit()">新建</el-button>
             </el-form-item>
@@ -27,15 +16,6 @@
                 align="center"
                 type="index"
                 :index="indexMethod">
-            </el-table-column>
-            <el-table-column
-                prop="agentName"
-                label="所属代理商"
-                min-width="180">
-            </el-table-column>
-            <el-table-column
-                prop="expressMerchantName"
-                label="所属商家">
             </el-table-column>
             <el-table-column
                 prop="serviceDay"
@@ -89,11 +69,6 @@
 
         <el-dialog title="期望上门时间" :visible.sync="dialogFormVisible">
             <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
-                <el-form-item label="所属商家" prop="merchantId" :label-width="formLabelWidth">
-                    <el-select v-model="addParam.merchantId" placeholder="请选择">
-                        <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item label="服务日期" prop="serviceDay" :label-width="formLabelWidth">
                     <el-select v-model="addParam.serviceDay" placeholder="请选择">
                         <el-option v-for="item in list.data" :key="item.val" :label="item.name" :value="item.val"></el-option>
@@ -134,9 +109,6 @@
                 },
                 addParam:{},
                 rules: {
-                    merchantId: [
-                        { required: true, message: '请选择商家', trigger: 'change' }
-                    ],
                     serviceDay: [
                         { required: true, message: '请选择服务日期', trigger: 'change' }
                     ],
@@ -165,7 +137,7 @@
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
                 //console.log('搜索条件',this.searchParam);
-                this.$axios.post("/express/manageClient/findExpressTimeListByPage",addToken(this.searchParam)).then((res)=>{
+                this.$axios.post("/express/merchantClient/findExpressTimeListByPage",addToken(this.searchParam)).then((res)=>{
                     this.searchLoading=false;
                     //console.log(res.data);
                     this.tableData=res.data.value;
@@ -176,7 +148,7 @@
                     if (valid) {
                         this.addLoading=true;
                         console.log(this.addParam);
-                        this.$axios.post("/express/manageClient/createOrMergeExpressTime",addToken(this.addParam)).then((res)=>{
+                        this.$axios.post("/express/merchantClient/createOrMergeExpressTime",addToken(this.addParam)).then((res)=>{
                             this.addLoading=false;
                             if(res.data.success){
                                 this.$message({
@@ -184,9 +156,7 @@
                                     type: 'success'
                                 });
                                 this.addInit();
-                                if(this.addParam.id){
-                                  this.onSearch()
-                                }
+                                this.onSearch()
                             }
                         }).catch((error)=>{
                             this.addLoading=false
@@ -204,7 +174,7 @@
                 }
                 if(id){
                     this.addLoading = true;
-                    this.$axios.post('/express/manageClient/findExpressTime',addToken({id})).then((res)=>{
+                    this.$axios.post('/express/merchantClient/findExpressTime',addToken({id})).then((res)=>{
                         this.addLoading = false;
                         console.log(res.data)
                         this.addParam=res.data.value

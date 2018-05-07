@@ -74,9 +74,12 @@ String.prototype.filtersOrders=function(state){
             text='待付款'
             break
         case 2:
-            text='代取件'
+            text='待确认'
             break
         case 3:
+            text='待取件'
+            break
+        case 4:
             text='已完成'
             break
         default:
@@ -150,11 +153,14 @@ window.list={
         name:'待付款',
         val:1
     }, {
-        name:'代取件',
+        name:'待确认',
         val:2
     }, {
-        name:'已完成',
+        name:'待取件',
         val:3
+    }, {
+        name:'已完成',
+        val:4
     }],
     hasBinding :[{
         name:'是',

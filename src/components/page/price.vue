@@ -1,13 +1,6 @@
 <template>
     <div>
         <el-form :inline="true" :model="searchParam" class="demo-form-inline">
-            <el-select v-model="searchParam.agentId" placeholder="代理商名称">
-                <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
-            </el-select>
-            <el-select v-model="searchParam.merchantId" placeholder="商户名称">
-                <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-            <el-button type="primary" @click="onSearch()">查询</el-button>
             <el-form-item style="float: right;">
                 <el-button type="primary" icon="el-icon-plus" @click="handleEdit()">新建</el-button>
             </el-form-item>
@@ -91,11 +84,6 @@
 
         <el-dialog title="价格设置" :visible.sync="dialogFormVisible">
             <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
-                <el-form-item label="商户名称" prop="merchantId" :label-width="formLabelWidth">
-                    <el-select v-model="addParam.merchantId" placeholder="商户名称">
-                        <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item label="发货地区" prop="consignerProvince" :label-width="formLabelWidth">
                     <el-select def v-model="addParam.consignerProvince" placeholder="请选择">
                         <el-option v-for="item in list.province" :key="item.id" :label="item.name" :value="item.id"></el-option>
@@ -154,7 +142,6 @@
                 list,
                 searchParam: {},
                 addParam:{
-                    merchantId:'',
                     consignerProvince:'',
                     consigneeProvince:'',
                     weight:'',
@@ -190,7 +177,6 @@
             addInit(type){ // 创建成功后初始化数据
                 this.dialogFormVisible=type || false;
                 this.addParam={
-                    merchantId:'',
                     consignerProvince:'',
                     consigneeProvince:'',
                     weight:'',
@@ -205,7 +191,7 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.addLoading=true
-                        this.$axios.post("/express/manageClient/createOrMergeExpressPrice",addToken(this.addParam) ).then((res)=>{
+                        this.$axios.post("/express/merchantClient/createOrMergeExpressPrice",addToken(this.addParam) ).then((res)=>{
                             this.addLoading=false
                             console.log(res.data,'创建成功')
                             if(res.data.success){
@@ -214,10 +200,8 @@
                                     message: this.addParam.id ? '修改成功' : '创建成功',
                                     type: 'success'
                                 });
-                                this.addInit()
-                                if(this.addParam.id){
-                                    this.onSearch()
-                                }
+                                this.addInit();
+                                this.onSearch();
                             }else{
                                 this.$message({
                                     message: res.data.message,
@@ -237,7 +221,7 @@
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
                 //console.log('搜索条件',this.searchParam);
-                this.$axios.post("/express/manageClient/findExpressPriceList",addToken(this.searchParam) ).then((res)=>{
+                this.$axios.post("/express/merchantClient/findExpressPriceList",addToken(this.searchParam) ).then((res)=>{
                     this.searchLoading=false;
                     //console.log('返回结果',res.data)
                     this.tableData=res.data.value
@@ -250,7 +234,7 @@
                 }
                 if(id){
                     this.addLoading = true;
-                    this.$axios.post('/express/manageClient/findExpressPrice',addToken({id})).then((res)=>{
+                    this.$axios.post('/express/merchantClient/findExpressPrice',addToken({id})).then((res)=>{
                         this.addLoading = false;
                         this.addParam=res.data.value
                     })
