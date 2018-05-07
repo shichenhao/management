@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-form :inline="true" :model="searchParam" class="demo-form-inline">
-            <el-select v-model="searchParam.agentId" placeholder="代理商名称">
+            <el-select v-if="loginType" v-model="searchParam.agentId" placeholder="代理商名称" @change="getMerchantName()">
                 <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
             </el-select>
             <el-select v-model="searchParam.merchantId" placeholder="商户名称">
@@ -147,6 +147,7 @@
                 }
             };
             return {
+                loginType:sessionStorage.getItem('loginType')==1 ? true : false,//登录权限 0 代理商 1 管理员
                 dialogFormVisible: false,//新增修改弹窗
                 addLoading:false,//添加loading
                 searchLoading:false,//搜索loading
@@ -187,6 +188,11 @@
             }
         },
         methods: {
+            getMerchantName(){ // 获取商户名称
+                this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId})).then((res)=>{
+                    window.list.merchantName=res.data.value
+                })
+            },
             addInit(type){ // 创建成功后初始化数据
                 this.dialogFormVisible=type || false;
                 this.addParam={
@@ -214,10 +220,10 @@
                                     message: this.addParam.id ? '修改成功' : '创建成功',
                                     type: 'success'
                                 });
-                                this.addInit()
-                                if(this.addParam.id){
-                                    this.onSearch()
-                                }
+                                this.addInit();
+                                //if(this.addParam.id){
+                                    this.onSearch();
+                                //}
                             }else{
                                 this.$message({
                                     message: res.data.message,

@@ -15,9 +15,17 @@
         },
         methods: {
             getCommon() {
-                //查询商家列表
-                this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken()).then((res)=>{
-                    window.list.merchantName=res.data.value
+                //获取权限
+                this.$axios.post('/express/manageClient/findManageLoginType',addToken()).then((res)=>{
+                    sessionStorage.setItem('loginType', res.data.value.loginType);
+
+                    if(res.data.value.loginType === 0){
+                        //查询商家列表
+                        this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken()).then((res)=>{
+                            window.list.merchantName=res.data.value
+                        })
+                    }
+
                 })
                 //查询下拉代理商列表
                 this.$axios.post('/express/manageClient/findAgentDTOList',addToken()).then((res)=>{
@@ -32,7 +40,8 @@
             }
         },
         mounted(){
-          let token=getUrlParms("token") || this.$route.query.token
+            let token=getUrlParms("token") || this.$route.query.token
+            console.log(token);
             if(token){
                 sessionStorage.setItem("token",token)
             }

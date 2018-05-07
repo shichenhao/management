@@ -3,7 +3,7 @@
         <el-form :inline="true" :model="searchParam" class="demo-form-inline">
             <el-form-item>
                 <el-select v-model="searchParam.agentId" placeholder="代理商名称">
-                    <el-option label="全部" value="0"></el-option>
+                    <!--<el-option label="全部" value="0"></el-option>-->
                     <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
                 </el-select>
             </el-form-item>
@@ -147,9 +147,7 @@
                                     type: 'success'
                                 });
                                 this.addInit();
-                                if(this.addParam.id){
-                                    this.onSearch()
-                                }
+                                this.onSearch();
                             }
                         }).catch((error)=>{
                             this.addLoading=false
