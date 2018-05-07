@@ -74,7 +74,11 @@ String.prototype.filtersOrders=function(state){
             text='待付款'
             break
         case 2:
+<<<<<<< HEAD
             text='待确认'
+=======
+            text='待取件'
+>>>>>>> e1760d65b7b10b8486fefb08eb8d712df3831b4b
             break
         case 3:
             text='待取件'
@@ -153,7 +157,11 @@ window.list={
         name:'待付款',
         val:1
     }, {
+<<<<<<< HEAD
         name:'待确认',
+=======
+        name:'待取件',
+>>>>>>> e1760d65b7b10b8486fefb08eb8d712df3831b4b
         val:2
     }, {
         name:'待取件',

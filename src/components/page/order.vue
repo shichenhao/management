@@ -2,7 +2,13 @@
     <div>
         <el-form :inline="true" :model="searchParam" class="demo-form-inline">
             <el-form-item>
+<<<<<<< HEAD
                 <el-button type="primary" :disabled="!multipleSelection.length" icon="el-icon-news" @click="clearOrder()">取件</el-button>
+=======
+                <el-select v-if="loginType" v-model="searchParam.agentId" placeholder="所属代理商" @change="getMerchantName()">
+                    <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
+                </el-select>
+>>>>>>> e1760d65b7b10b8486fefb08eb8d712df3831b4b
             </el-form-item>
         </el-form>
         <el-table
@@ -128,6 +134,7 @@
     export default {
         data() {
             return {
+                loginType:sessionStorage.getItem('loginType')==1 ? true : false,//登录权限 0 代理商 1 管理员
                 dialogFormVisible: false,//新增修改弹窗
                 addLoading:false,//添加loading
                 searchLoading:false,//搜索loading
