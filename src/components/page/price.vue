@@ -1,16 +1,6 @@
 <template>
     <div>
         <el-form :inline="true" :model="searchParam" class="demo-form-inline">
-<<<<<<< HEAD
-=======
-            <el-select v-if="loginType" v-model="searchParam.agentId" placeholder="代理商名称" @change="getMerchantName()">
-                <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
-            </el-select>
-            <el-select v-model="searchParam.merchantId" placeholder="商户名称">
-                <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-            <el-button type="primary" @click="onSearch()">查询</el-button>
->>>>>>> e1760d65b7b10b8486fefb08eb8d712df3831b4b
             <el-form-item style="float: right;">
                 <el-button type="primary" icon="el-icon-plus" @click="handleEdit()">新建</el-button>
             </el-form-item>
@@ -217,13 +207,7 @@
                                     type: 'success'
                                 });
                                 this.addInit();
-<<<<<<< HEAD
                                 this.onSearch();
-=======
-                                //if(this.addParam.id){
-                                    this.onSearch();
-                                //}
->>>>>>> e1760d65b7b10b8486fefb08eb8d712df3831b4b
                             }else{
                                 this.$message({
                                     message: res.data.message,

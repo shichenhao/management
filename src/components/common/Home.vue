@@ -15,8 +15,6 @@
         },
         methods: {
             getCommon() {
-<<<<<<< HEAD
-=======
                 //获取权限
                 this.$axios.post('/express/manageClient/findManageLoginType',addToken()).then((res)=>{
                     sessionStorage.setItem('loginType', res.data.value.loginType);
@@ -29,11 +27,6 @@
                     }
 
                 })
-                //查询下拉代理商列表
-                this.$axios.post('/express/manageClient/findAgentDTOList',addToken()).then((res)=>{
-                    window.list.agentName=res.data.value
-                })
->>>>>>> e1760d65b7b10b8486fefb08eb8d712df3831b4b
                 //查询省市区列表
                 this.$axios.post('/express/public/findRegionDataDTOList').then((res)=>{
                     //sessionStorage.setItem('merchantId',1222)

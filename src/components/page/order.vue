@@ -2,13 +2,7 @@
     <div>
         <el-form :inline="true" :model="searchParam" class="demo-form-inline">
             <el-form-item>
-<<<<<<< HEAD
                 <el-button type="primary" :disabled="!multipleSelection.length" icon="el-icon-news" @click="clearOrder()">取件</el-button>
-=======
-                <el-select v-if="loginType" v-model="searchParam.agentId" placeholder="所属代理商" @change="getMerchantName()">
-                    <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
-                </el-select>
->>>>>>> e1760d65b7b10b8486fefb08eb8d712df3831b4b
             </el-form-item>
         </el-form>
         <el-table
@@ -73,14 +67,13 @@
             </el-table-column>
             <el-table-column
                 label="订单状态"
-                prop="name"
                 width="100"
                 align="center">
                 <template slot-scope="scope">
                     {{"状态".filtersOrders(scope.row.status)}}
                 </template>
             </el-table-column>
-            <!--<el-table-column
+            <el-table-column
                 label="备注"
                 width="120"
                 prop="remark">
@@ -92,13 +85,7 @@
                 align="center">
             </el-table-column>
             <el-table-column
-                label="费用预估"
-                prop="totalPrice"
-                width="100"
-                align="center">
-            </el-table-column>
-            <el-table-column
-                label="付款金额"
+                label="基础费用"
                 prop="price"
                 width="100"
                 align="center">
@@ -108,7 +95,54 @@
                 prop="sysRateAmt"
                 width="100"
                 align="center">
-            </el-table-column>-->
+            </el-table-column>
+            <el-table-column
+                label="省级代理商收益"
+                prop="provinceAgentRateAmt"
+                width="100"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="合伙人收益"
+                prop="partnerAgentRateAmt"
+                width="100"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="板块服务商"
+                prop="merchantAmt"
+                width="100"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="付款类型"
+                prop="sysRateAmt"
+                width="100"
+                align="center">
+                <template slot-scope="scope">
+                    在线支付
+                </template>
+            </el-table-column>
+            <el-table-column
+                label="付款状态"
+                width="100"
+                align="center">
+                <template slot-scope="scope">
+                    {{"状态".filtersOrders(scope.row.status)}}
+                </template>
+            </el-table-column>
+            <el-table-column
+                label="更新时间"
+                prop="modifyTime"
+                width="100"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="创建时间"
+                prop="createTime"
+                width="100"
+                align="center">
+            </el-table-column>
             <el-table-column
                 label="操作"
                 width="100"
