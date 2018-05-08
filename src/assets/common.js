@@ -169,6 +169,22 @@ window.list={
         name:'否',
         val:0
     }],
+    bankName :[{
+        name:'中国银行',
+        val:'中国银行'
+    }, {
+        name:'中国工商银行',
+        val:'中国工商银行'
+    }, {
+        name:'中国农业银行',
+        val:'中国农业银行'
+    }, {
+        name:'中国建设银行',
+        val:'中国建设银行'
+    }, {
+        name:'中国邮政储蓄银行',
+        val:'中国邮政储蓄银行'
+    }],
     accountType :[{
         name:'公账',
         val:1

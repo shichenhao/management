@@ -156,8 +156,13 @@
                         <el-option v-for="item in list.accountType" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="银行名称" prop="bankName" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
+                <el-form-item label="银行名称" prop="bankName" :label-width="formLabelWidth" v-if="!addParam.hasBinding && addParam.accountType==1">
                     <el-input v-model="addParam.bankName"></el-input>
+                </el-form-item>
+                <el-form-item label="银行名称" prop="bankName" :label-width="formLabelWidth" v-if="!addParam.hasBinding && addParam.accountType==0">
+                    <el-select v-model="addParam.bankName">
+                        <el-option v-for="item in list.bankName" :key="item.val" :label="item.name" :value="item.val"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="银行卡号" prop="bankCard" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
                     <el-input v-model="addParam.bankCard"></el-input>
@@ -193,7 +198,7 @@
                 }
             };
             let commissionRateValidata = (rule, value, callback) => {
-                if(!value || value == ''){
+                if((!value && value !==0 )|| value === ''){
                     callback(new Error('请填写佣金比例'));
                 }else if(value>100){
                     callback(new Error('佣金比例不能大于100'));
@@ -203,7 +208,7 @@
             };
             let commissionAmtValidata = (rule, value, callback) => {
                 let reg = /^(?:(?:(?:[1-9]\d{0,2}(?:,\d{3})*)|[1-9]\d*|0))(?:\.\d{1,2})?$/;
-                if(!value || value == ''){
+                if(!value || value === ''){
                     callback(new Error('请填写佣金金额'));
                 }else if(!reg.test(value)){
                     callback(new Error('请填写正确的佣金金额'));

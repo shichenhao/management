@@ -124,6 +124,15 @@
 <script>
     export default {
         data() {
+            let dateValidata = (rule, value, callback) => {
+                if(!value || value == ''){
+                    callback(new Error('请填写取件时段'));
+                }else if(value.split(',').length>8){
+                    callback(new Error('取件时间最多只可设置8个时间段'));
+                }else{
+                    callback();
+                }
+            };
             return {
                 loginType:sessionStorage.getItem('loginType')==1 ? true : false,//登录权限 0 代理商 1 管理员
                 dialogFormVisible: false,//新增修改弹窗
@@ -142,7 +151,7 @@
                         { required: true, message: '请选择服务日期', trigger: 'change' }
                     ],
                     serviceTime: [
-                        { required: true, message: '请填写取件时段', trigger: 'change' }
+                        { required: true, validator: dateValidata,  trigger: 'blur' }
                     ],
                     status: [
                         { required: true, message: '请选择状态', trigger: 'change' }

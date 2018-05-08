@@ -109,14 +109,13 @@
             </el-table-column>
             <el-table-column
                 label="订单状态"
-                prop="name"
                 width="100"
                 align="center">
                 <template slot-scope="scope">
                     {{"状态".filtersOrders(scope.row.status)}}
                 </template>
             </el-table-column>
-            <!--<el-table-column
+            <el-table-column
                 label="备注"
                 width="120"
                 prop="remark">
@@ -128,13 +127,7 @@
                 align="center">
             </el-table-column>
             <el-table-column
-                label="费用预估"
-                prop="totalPrice"
-                width="100"
-                align="center">
-            </el-table-column>
-            <el-table-column
-                label="付款金额"
+                label="基础费用"
                 prop="price"
                 width="100"
                 align="center">
@@ -144,7 +137,54 @@
                 prop="sysRateAmt"
                 width="100"
                 align="center">
-            </el-table-column>-->
+            </el-table-column>
+            <el-table-column
+                label="省级代理商收益"
+                prop="provinceAgentRateAmt"
+                width="100"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="合伙人收益"
+                prop="partnerAgentRateAmt"
+                width="100"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="板块服务商"
+                prop="merchantAmt"
+                width="100"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="付款类型"
+                prop="sysRateAmt"
+                width="100"
+                align="center">
+                <template slot-scope="scope">
+                    在线支付
+                </template>
+            </el-table-column>
+            <el-table-column
+                label="付款状态"
+                width="100"
+                align="center">
+                <template slot-scope="scope">
+                    {{"状态".filtersOrders(scope.row.status)}}
+                </template>
+            </el-table-column>
+            <el-table-column
+                label="更新时间"
+                prop="modifyTime"
+                width="100"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="创建时间"
+                prop="createTime"
+                width="100"
+                align="center">
+            </el-table-column>
             <el-table-column
                 label="操作"
                 width="100"
