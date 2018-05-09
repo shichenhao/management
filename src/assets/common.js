@@ -108,6 +108,12 @@ String.prototype.filtersHasBinding=function(state){
 window.list={
     merchantName:[],//商户名称
     agentName:[],//代理商名称
+    agentNameAdd:[
+        {
+            name:'admin',
+            id:1
+        }
+    ],//管理员代理商名称
     province:[],//省
     city:[],//市
     district:[],//区

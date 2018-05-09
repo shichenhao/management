@@ -203,6 +203,29 @@
                 :total="tableData.total || 0">
             </el-pagination>
         </div>
+
+
+
+        <el-dialog title="取消订单" :visible.sync="dialogFormVisible">
+            <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
+                <el-form-item label="取消原因" prop="cancelReason" :label-width="formLabelWidth">
+                    <el-input
+                        type="textarea"
+                        :rows="2"
+                        placeholder="请输入取消原因"
+                        v-model="addParam.cancelReason">
+                    </el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="addInit()">取 消</el-button>
+                <el-button type="primary" @click="handleAdd('addParam')">确 定</el-button>
+            </div>
+        </el-dialog>
+
+
+
+
     </div>
 </template>
 
@@ -246,9 +269,20 @@
                         }
                     }]
                 },
+                rules: {
+                    cancelReason: [
+                        { required: true, message: '请填写取消原因', trigger: 'change' }
+                    ],
+                },
+                formLabelWidth: '100px'
             }
         },
         methods: {
+            getMerchantName(){ // 获取商户名称
+                this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId || this.addParam.agentId})).then((res)=>{
+                    window.list.merchantName=res.data.value
+                })
+            },
             onSearch(start) {//搜索
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
@@ -268,7 +302,6 @@
             },
             clearOrder(id) {//取件
                 let ids = this.multipleSelection.map(item=> item.id).toString();
-                this.dialogFormVisible=true
                 this.$axios.post('/express/manageClient/batchDoneExpressOrder',addToken({ids})).then((res)=>{
                   if(res.data.success){
                     this.onSearch()
@@ -277,16 +310,36 @@
                     this.$message.error(error.response.data.message);
                 })
             },
-            cancelOrder(id) {//取消订单
-                console.log(id)
-                this.dialogFormVisible=true
-                this.$axios.post('/express/manageClient/cancelExpressOrder',addToken({id})).then((res)=>{
+            cancelOrder(id) {//取消订单弹窗
+                this.dialogFormVisible = true;
+                this.addParam.id = id;
+                //cancelReason
+                /*this.$axios.post('/express/manageClient/cancelExpressOrder',addToken({id})).then((res)=>{
                   if(res.data.success){
                     this.onSearch()
                   }
                 }).catch((error)=>{
                     this.$message.error(error.response.data.message);
-                })
+                })*/
+            },
+            handleAdd(formName) {//取消订单
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.addLoading = true;
+                        this.$axios.post('/express/manageClient/cancelExpressOrder',addToken(this.addParam)).then((res)=>{
+                          if(res.data.success){
+                              this.$message.success("取消成功");
+                              this.dialogFormVisible = false;
+                              this.addLoading = false;
+                          }
+                        }).catch((error)=>{
+                            this.$message.error(error.response.data.message);
+                            this.addLoading = false;
+                        })
+                    } else {
+                        return false;
+                    }
+                });
             },
             lookOrder(txt){ // 查看取消原因
                 this.$alert(txt , '取消原因', {
@@ -299,7 +352,6 @@
                 }else{
                     return false
                 }
-
             }
         },
         created(){

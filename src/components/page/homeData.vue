@@ -89,8 +89,13 @@
 
         <el-dialog title="期望上门时间" :visible.sync="dialogFormVisible">
             <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
-                <el-form-item label="所属商家" prop="merchantId" :label-width="formLabelWidth">
-                    <el-select v-model="addParam.merchantId" placeholder="请选择">
+                <el-form-item label="所属代理商" prop="agentId" :label-width="formLabelWidth" v-if="(!addParam.agentId || addParam.agentId==1) && loginType">
+                    <el-select v-model="addParam.agentId" placeholder="请选择" @change="getMerchantName()">
+                        <el-option v-for="item in list.agentNameAdd" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="商户名称" prop="merchantId" :label-width="formLabelWidth">
+                    <el-select v-model="addParam.merchantId" placeholder="商户名称">
                         <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
@@ -142,8 +147,13 @@
                 list,
                 searchParam: {
                 },
-                addParam:{},
+                addParam:{
+                    agentId:'',
+                },
                 rules: {
+                    agentId: [
+                        { required: true, message: '请选择代理商', trigger: 'change' }
+                    ],
                     merchantId: [
                         { required: true, message: '请选择商家', trigger: 'change' }
                     ],
@@ -164,6 +174,11 @@
             }
         },
         methods: {
+            getMerchantName(){ // 获取商户名称
+                this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId || this.addParam.agentId})).then((res)=>{
+                    window.list.merchantName=res.data.value
+                })
+            },
             addInit(type){ // 创建成功后初始化数据
                 this.dialogFormVisible=type || false;
                 this.addParam={};
@@ -215,10 +230,17 @@
                 if(id){
                     this.addLoading = true;
                     this.$axios.post('/express/manageClient/findExpressTime',addToken({id})).then((res)=>{
+                        this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:res.data.value.agentId})).then((res)=>{
+                            window.list.merchantName=res.data.value
+                        })
                         this.addLoading = false;
                         console.log(res.data)
                         this.addParam=res.data.value
                     })
+                }else{
+                    if(window.loginType === 1){
+                        window.list.merchantName=[]
+                    }
                 }
             },
         },

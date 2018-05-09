@@ -91,6 +91,11 @@
 
         <el-dialog title="价格设置" :visible.sync="dialogFormVisible">
             <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
+                <el-form-item label="所属代理商" prop="agentId" :label-width="formLabelWidth" v-if="(addParam.agentId==1 || addParam.agentId=='') && loginType">
+                    <el-select v-model="addParam.agentId" placeholder="请选择" @change="getMerchantName()">
+                        <el-option v-for="item in list.agentNameAdd" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="商户名称" prop="merchantId" :label-width="formLabelWidth">
                     <el-select v-model="addParam.merchantId" placeholder="商户名称">
                         <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
@@ -155,6 +160,7 @@
                 list,
                 searchParam: {},
                 addParam:{
+                    agentId:'',
                     merchantId:'',
                     consignerProvince:'',
                     consigneeProvince:'',
@@ -165,6 +171,9 @@
                 form:{
                 },
                 rules: {
+                    agentId: [
+                        { required: true, message: '请选择代理商', trigger: 'change' }
+                    ],
                     merchantId: [
                         { required: true, message: '请选择商家', trigger: 'change' }
                     ],
@@ -189,13 +198,14 @@
         },
         methods: {
             getMerchantName(){ // 获取商户名称
-                this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId})).then((res)=>{
+                this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId || this.addParam.agentId})).then((res)=>{
                     window.list.merchantName=res.data.value
                 })
             },
             addInit(type){ // 创建成功后初始化数据
                 this.dialogFormVisible=type || false;
                 this.addParam={
+                    agentId:'',
                     merchantId:'',
                     consignerProvince:'',
                     consigneeProvince:'',
@@ -243,7 +253,7 @@
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
                 //console.log('搜索条件',this.searchParam);
-                this.$axios.post("/express/manageClient/findExpressPriceList",addToken(this.searchParam) ).then((res)=>{
+                this.$axios.post("/express/manageClient/findExpressPriceList",addToken(this.searchParam)).then((res)=>{
                     this.searchLoading=false;
                     //console.log('返回结果',res.data)
                     this.tableData=res.data.value
@@ -257,9 +267,16 @@
                 if(id){
                     this.addLoading = true;
                     this.$axios.post('/express/manageClient/findExpressPrice',addToken({id})).then((res)=>{
+                        this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:res.data.value.agentId})).then((res)=>{
+                            window.list.merchantName=res.data.value
+                        })
                         this.addLoading = false;
                         this.addParam=res.data.value
                     })
+                }else{
+                    if(window.loginType === 1){
+                        window.list.merchantName=[]
+                    }
                 }
             },
         },

@@ -2,8 +2,7 @@
     <div>
         <el-form :inline="true" :model="searchParam" class="demo-form-inline">
             <el-form-item>
-                <el-select v-model="searchParam.agentId" placeholder="代理商名称">
-                    <!--<el-option label="全部" value="0"></el-option>-->
+                <el-select v-if="loginType" v-model="searchParam.agentId" placeholder="代理商名称" @change="getMerchantName()">
                     <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
                 </el-select>
             </el-form-item>
@@ -65,6 +64,11 @@
 
         <el-dialog title="广告" :visible.sync="dialogFormVisible">
             <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
+                <el-form-item label="所属代理商" prop="agentId" :label-width="formLabelWidth" v-if="loginType">
+                    <el-select v-model="addParam.agentId" placeholder="请选择">
+                        <el-option v-for="item in list.agentNameAdd" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="跳转地址" prop="gotoUrl" :label-width="formLabelWidth">
                     <label class="adFile">
                         上传图片
@@ -87,6 +91,7 @@
     export default {
         data() {
             return {
+                loginType:sessionStorage.getItem('loginType')==1 ? true : false,//登录权限 0 代理商 1 管理员
                 dialogFormVisible: false,//新增修改弹窗
                 addLoading:false,//添加loading
                 searchLoading:false,//搜索loading
@@ -97,17 +102,8 @@
                 },
                 addParam:{},
                 rules: {
-                    merchantId: [
-                        { required: true, message: '请选择商家', trigger: 'change' }
-                    ],
-                    serviceDay: [
-                        { required: true, message: '请选择服务日期', trigger: 'change' }
-                    ],
-                    serviceTime: [
-                        { required: true, message: '请填写取件时段', trigger: 'change' }
-                    ],
-                    status: [
-                        { required: true, message: '请选择状态', trigger: 'change' }
+                    agentId: [
+                        { required: true, message: '请选择代理商', trigger: 'change' }
                     ],
                 },
                 form:{

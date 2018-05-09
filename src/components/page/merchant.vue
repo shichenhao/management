@@ -102,34 +102,40 @@
 
         <el-dialog title="商家" :visible.sync="dialogFormVisible">
             <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
+                <el-form-item label="所属代理商" :label-width="formLabelWidth" v-if="loginType">
+                    <el-select v-model="addParam.agentId" placeholder="请选择" :disabled="isEdit">
+                        <el-option v-for="item in list.agentNameAdd" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="登录账号" prop="loginName" :label-width="formLabelWidth">
-                    <el-input v-model="addParam.loginName"></el-input>
+                    <el-input v-model="addParam.loginName" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="登录密码" prop="loginPwd" :label-width="formLabelWidth">
-                    <el-input type="password" v-model="addParam.loginPwd"></el-input>
+                    <el-input type="password" v-model="addParam.loginPwd" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="商户名称" prop="name" :label-width="formLabelWidth">
-                    <el-input v-model="addParam.name"></el-input>
+                    <el-input v-model="addParam.name" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="标识" :label-width="formLabelWidth">
-                    <label class="adFile">
+                    <label class="adFile" v-if="!isEdit">
                         上传图片
                         <input class="file" name="file" type="file" accept="image/png,image/gif,image/jpeg" @change="update"/>
                     </label>
+                    <img width="100" height="100" :src="addParam.identityImg" v-if="isEdit">
                 </el-form-item>
                 <el-form-item label="佣金抽取方式" :label-width="formLabelWidth">
-                    <el-select v-model="addParam.commissionType">
+                    <el-select v-model="addParam.commissionType" :disabled="isEdit">
                         <el-option v-for="item in list.commissionType" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="佣金比例" prop="commissionRate" :label-width="formLabelWidth" v-if="addParam.commissionType=='1'">
-                    <el-input v-model="addParam.commissionRate"></el-input>
+                    <el-input v-model="addParam.commissionRate" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="佣金固定金额" prop="commissionAmt" :label-width="formLabelWidth" v-if="addParam.commissionType=='2'">
-                    <el-input v-model="addParam.commissionAmt"></el-input>
+                    <el-input v-model="addParam.commissionAmt" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="关联已有账号" :label-width="formLabelWidth">
-                    <el-select v-model="addParam.hasBinding">
+                    <el-select v-model="addParam.hasBinding" :disabled="isEdit">
                         <el-option v-for="item in list.hasBinding" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
@@ -171,7 +177,7 @@
                     <el-input v-model="addParam.bankPerson"></el-input>
                 </el-form-item>
                 <el-form-item label="状态" :label-width="formLabelWidth">
-                    <el-select v-model="addParam.state" placeholder="请选择">
+                    <el-select v-model="addParam.state" placeholder="请选择" :disabled="isEdit">
                         <el-option v-for="item in list.status" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
@@ -198,9 +204,10 @@
                 }
             };
             let commissionRateValidata = (rule, value, callback) => {
+                let reg =/^[0-9]*$/
                 if((!value && value !==0 )|| value === ''){
                     callback(new Error('请填写佣金比例'));
-                }else if(value>100){
+                }else if(!reg.test(value) || value > 100){
                     callback(new Error('佣金比例不能大于100'));
                 }else{
                     callback();
@@ -217,6 +224,7 @@
                 }
             };
             return {
+                isEdit:false, //编辑状态 不可修改
                 loginType:sessionStorage.getItem('loginType')==1 ? true : false,//登录权限 0 代理商 1 管理员
                 dialogFormVisible: false,//新增修改弹窗
                 addLoading:false,//添加loading
@@ -257,6 +265,7 @@
                     ],
                 },
                 addParam:{
+                    agentId:sessionStorage.getItem('loginType')==1 ? 1 : null,
                     mobile:null,
                     accountName:null,
                     commissionType:1,
@@ -268,7 +277,11 @@
             }
         },
         methods: {
-
+            getMerchantName(){ // 获取商户名称
+                this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId || this.addParam.agentId})).then((res)=>{
+                    window.list.merchantName=res.data.value
+                })
+            },
             init(){
                 this.$axios.post('/express/manageClient/findExpressMerchantAndUser',addToken({id:1})).then((res)=>{
                     console.log(res.data)
@@ -287,6 +300,7 @@
             addInit(type){ // 创建成功后初始化数据
                 this.dialogFormVisible=type || false;
                 this.addParam={
+                    agentId:sessionStorage.getItem('loginType')==1 ? 1 : null,
                     commissionType:1,
                     accountType:1,
                     hasBinding:1,
@@ -317,7 +331,9 @@
                             delete this.addParam.city
                             delete this.addParam.district
                         }
-
+                        if(window.loginType === 0){
+                            delete this.addParam.agentId
+                        }
 
                         this.$axios.post("/express/manageClient/createOrMergeExpressMerchant",addToken(this.addParam) ).then((res)=>{
                             this.addLoading=false
@@ -363,16 +379,19 @@
                 })
             },
             handleEdit(id) {//修改
-                console.log(this.addParam.hasBinding)
+                this.isEdit = false;
                 this.addInit(true)
                 if(this.$refs['addParam']!==undefined){
                     this.$refs['addParam'].resetFields();
                 }
                 if(id){
+                    this.isEdit = true;
                     this.addLoading = true;
                     this.$axios.post('/express/manageClient/findExpressMerchantAndUser',addToken({id})).then((res)=>{
                         this.addLoading = false;
+                        let accountName = res.data.value.merchantUserDTO.name;
                         this.addParam=Object.assign(res.data.value.merchantUserDTO,res.data.value)
+                        this.addParam.accountName= accountName
                         delete this.addParam.identityImg
                         delete this.addParam.commissionAmt
                         this.handleProvince('city','province')
