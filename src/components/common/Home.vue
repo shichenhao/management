@@ -28,10 +28,6 @@
                     }
 
                 })
-                //查询下拉代理商列表
-                this.$axios.post('/express/manageClient/findAgentDTOList',addToken()).then((res)=>{
-                    window.list.agentName=res.data.value
-                })
                 //查询省市区列表
                 this.$axios.post('/express/public/findRegionDataDTOList').then((res)=>{
                     //sessionStorage.setItem('merchantId',1222)
