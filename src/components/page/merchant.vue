@@ -124,15 +124,15 @@
                     <img width="100" height="100" :src="addParam.identityImg" v-if="isEdit">
                 </el-form-item>
                 <el-form-item label="佣金抽取方式" :label-width="formLabelWidth">
-                    <el-select v-model="addParam.commissionType" :disabled="isEdit">
+                    <el-select v-model="addParam.commissionType">
                         <el-option v-for="item in list.commissionType" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="佣金比例" prop="commissionRate" :label-width="formLabelWidth" v-if="addParam.commissionType=='1'">
-                    <el-input v-model="addParam.commissionRate" :disabled="isEdit"></el-input>
+                    <el-input v-model="addParam.commissionRate"></el-input>
                 </el-form-item>
                 <el-form-item label="佣金固定金额" prop="commissionAmt" :label-width="formLabelWidth" v-if="addParam.commissionType=='2'">
-                    <el-input v-model="addParam.commissionAmt" :disabled="isEdit"></el-input>
+                    <el-input v-model="addParam.commissionAmt"></el-input>
                 </el-form-item>
                 <el-form-item label="关联已有账号" :label-width="formLabelWidth">
                     <el-select v-model="addParam.hasBinding" :disabled="isEdit">
@@ -177,7 +177,7 @@
                     <el-input v-model="addParam.bankPerson"></el-input>
                 </el-form-item>
                 <el-form-item label="状态" :label-width="formLabelWidth">
-                    <el-select v-model="addParam.state" placeholder="请选择" :disabled="isEdit">
+                    <el-select v-model="addParam.state" placeholder="请选择" >
                         <el-option v-for="item in list.status" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
@@ -392,7 +392,6 @@
                         let accountName = res.data.value.merchantUserDTO.name;
                         this.addParam=Object.assign(res.data.value.merchantUserDTO,res.data.value)
                         this.addParam.accountName= accountName
-                        delete this.addParam.identityImg
                         delete this.addParam.commissionAmt
                         this.handleProvince('city','province')
 
@@ -416,7 +415,7 @@
                         this.addLoading = false;
                         if(res.data.success){
                             this.$message.success('上传成功');
-                            this.addParam.multipartFile=res.data.value
+                            this.addParam.identityImg=res.data.value
                         }
                     })
             },

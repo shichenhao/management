@@ -28,6 +28,14 @@ export default new Router({
                 {
                     path: '/order',
                     component: resolve => require(['../components/page/order.vue'], resolve)
+                },
+                {
+                    path: '/merchant',
+                    component: resolve => require(['../components/page/merchant.vue'], resolve)
+                },
+                {
+                    path: '/ad',
+                    component: resolve => require(['../components/page/ad.vue'], resolve)
                 }
             ]
         }

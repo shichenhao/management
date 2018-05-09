@@ -62,6 +62,13 @@
             >
             </el-table-column>
             <el-table-column
+                label="编号"
+                width="60"
+                align="center"
+                type="index"
+                :index="indexMethod">
+            </el-table-column>
+            <el-table-column
                 label="订单号"
                 prop="id"
                 width="160"

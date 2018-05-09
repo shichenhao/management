@@ -26,12 +26,12 @@ module.exports = {
                     '/express/public':''
                 }
             },
-            '/express/merchantClient':{
-                target:'http://39.108.16.242/express/merchantClient',
+            '/express/manageClient':{
+                target:'http://39.108.16.242/express/manageClient',
                 //target:'http://39.108.16.242/express/public',
                 changeOrigin:true,
                 pathRewrite:{
-                    '/express/merchantClient':''
+                    '/express/manageClient':''
                 }
             }
         },
