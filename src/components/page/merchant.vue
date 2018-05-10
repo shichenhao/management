@@ -307,6 +307,13 @@
                     hasBinding:1,
                     state:1,
                 }
+
+                if(!loginType){
+                    this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken()).then((res)=>{
+                        window.list.merchantName=res.data.value
+                        console.log(window.list.merchantName)
+                    })
+                }
             },
             handleAdd(formName) {//新增
                 this.$refs[formName].validate((valid) => {
@@ -395,6 +402,7 @@
                         if(this.addParam.commissionType==1){
                             delete this.addParam.commissionAmt
                         }else{
+                            this.addParam.commissionAmt = this.addParam.commissionAmt.toString()
                             delete this.addParam.commissionRate
                         }
                         this.handleProvince('city','province')

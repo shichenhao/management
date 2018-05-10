@@ -45,7 +45,7 @@
             </el-form-item>
         </el-form>
         <el-form style="padding: 0 0 20px">
-            <el-button type="primary" :disabled="!multipleSelection.length" icon="el-icon-news" @click="clearOrder()">取件</el-button>
+            <el-button type="primary" :disabled="!multipleSelection.length" icon="el-icon-news" @click="clearOrder('/express/manageClient/batchDoneExpressOrder')">取件</el-button>
         </el-form>
         <el-table
             v-loading="searchLoading"
@@ -53,6 +53,7 @@
             border
             tooltip-effect="dark"
             style="width: 100%"
+            height="500"
             @selection-change="handleSelectionChange">
             <el-table-column
                 type="selection"
@@ -199,6 +200,7 @@
                 <template slot-scope="scope">
                     <el-button type="text" v-if="scope.row.status === 0 || scope.row.status === 1" @click="cancelOrder(scope.row.id)" size="small">取消订单</el-button>
                     <el-button type="text" v-if="scope.row.status === -1" @click="lookOrder(scope.row.cancelReason)" size="small">查看取消原因</el-button>
+                    <el-button type="text" v-if="scope.row.status === 2" @click="clearOrder('/express/manageClient/confirmExpressOrder',scope.row.id)" size="small">确认订单</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -310,9 +312,9 @@
             handleSelectionChange(val) {//选中的数据
                 this.multipleSelection = val;
             },
-            clearOrder(id) {//取件
-                let ids = this.multipleSelection.map(item=> item.id).toString();
-                this.$axios.post('/express/manageClient/batchDoneExpressOrder',addToken({ids})).then((res)=>{
+            clearOrder(url, id) {//取件
+                let ids = id || this.multipleSelection.map(item=> item.id).toString();
+                this.$axios.post(url, addToken(id ? { id } : { ids })).then((res)=>{
                   if(res.data.success){
                     this.$message.success('操作成功！');
                     this.onSearch()
