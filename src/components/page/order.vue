@@ -290,6 +290,9 @@
                     window.list.merchantName=res.data.value
                 })
             },
+            indexMethod(index) {//序号
+                return index + 1;
+            },
             onSearch(start) {//搜索
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
@@ -311,6 +314,7 @@
                 let ids = this.multipleSelection.map(item=> item.id).toString();
                 this.$axios.post('/express/manageClient/batchDoneExpressOrder',addToken({ids})).then((res)=>{
                   if(res.data.success){
+                    this.$message.success('操作成功！');
                     this.onSearch()
                   }
                 }).catch((error)=>{
@@ -354,7 +358,7 @@
                 });
             },
             selectable(row){
-                if(row.status === 2){
+                if(row.status === 3){
                     return true
                 }else{
                     return false

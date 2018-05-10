@@ -204,6 +204,7 @@
                 }
             };
             let commissionRateValidata = (rule, value, callback) => {
+                console.log(value)
                 let reg =/^[0-9]*$/
                 if((!value && value !==0 )|| value === ''){
                     callback(new Error('请填写佣金比例'));
@@ -243,7 +244,7 @@
                         { required: true, message: '请填写商户名称', trigger: 'change' }
                     ],
                     commissionRate: [
-                        { required: true, validator: commissionRateValidata,  trigger: 'blur' }
+                        { required: true, validator: commissionRateValidata,  trigger: 'change' }
                     ],
                     commissionAmt: [
                         { required: true, validator: commissionAmtValidata,  trigger: 'blur' }
@@ -312,14 +313,13 @@
                     if (valid) {
                         this.addLoading=true
                         delete this.addParam.merchantUserDTO
-
                         if(this.addParam.commissionType==1){
                             delete this.addParam.commissionAmt
                         }else{
                             delete this.addParam.commissionRate
                         }
 
-                        if(this.addParam.hasBinding==1){
+                        /*if(this.addParam.hasBinding==1){
                             delete this.addParam.accountName
                             delete this.addParam.mobile
                             delete this.addParam.address
@@ -330,7 +330,7 @@
                             delete this.addParam.province
                             delete this.addParam.city
                             delete this.addParam.district
-                        }
+                        }*/
                         if(window.loginType === 0){
                             delete this.addParam.agentId
                         }
@@ -392,7 +392,11 @@
                         let accountName = res.data.value.merchantUserDTO.name;
                         this.addParam=Object.assign(res.data.value.merchantUserDTO,res.data.value)
                         this.addParam.accountName= accountName
-                        delete this.addParam.commissionAmt
+                        if(this.addParam.commissionType==1){
+                            delete this.addParam.commissionAmt
+                        }else{
+                            delete this.addParam.commissionRate
+                        }
                         this.handleProvince('city','province')
 
                     })
