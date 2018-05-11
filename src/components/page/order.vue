@@ -82,7 +82,7 @@
             </el-table-column>
             <el-table-column
                 label="所属商家"
-                prop="expressMerchantName"
+                prop="expressMerchant.name"
                 width="120">
             </el-table-column>
             <el-table-column
@@ -114,6 +114,9 @@
                 prop="modifyTime"
                 width="110"
                 align="center">
+                <template slot-scope="scope">
+                    {{scope.row.pickUpDate + ' ' + scope.row.pickUpTime}}
+                </template>
             </el-table-column>
             <el-table-column
                 label="订单状态"
@@ -130,7 +133,7 @@
             </el-table-column>
             <el-table-column
                 label="快递公司"
-                prop="expressMerchantName"
+                prop="expressMerchant.name"
                 width="120"
                 align="center">
             </el-table-column>
@@ -295,6 +298,10 @@
             indexMethod(index) {//序号
                 return index + 1;
             },
+            addInit(type){ // 创建成功后初始化数据
+                this.dialogFormVisible=type || false;
+                this.addParam={}
+            },
             onSearch(start) {//搜索
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
@@ -326,6 +333,9 @@
             cancelOrder(id) {//取消订单弹窗
                 this.dialogFormVisible = true;
                 this.addParam.id = id;
+                if(this.$refs['addParam']!==undefined){
+                    this.$refs['addParam'].resetFields();
+                }
                 //cancelReason
                 /*this.$axios.post('/express/manageClient/cancelExpressOrder',addToken({id})).then((res)=>{
                   if(res.data.success){
