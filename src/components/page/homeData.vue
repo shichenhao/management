@@ -87,8 +87,8 @@
             </el-pagination>
         </div>
 
-        <el-dialog title="期望上门时间" :visible.sync="dialogFormVisible">
-            <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
+        <el-dialog title="期望上门时间" :visible.sync="dialogFormVisible" v-loading="addLoading">
+            <el-form :model="addParam" :rules="rules" ref="addParam">
                 <el-form-item label="所属代理商" prop="agentId" :label-width="formLabelWidth" v-if="(!addParam.agentId || addParam.agentId==1) && loginType">
                     <el-select v-model="addParam.agentId" placeholder="请选择" @change="getMerchantName()">
                         <el-option v-for="item in list.agentNameAdd" :key="item.id" :label="item.name" :value="item.id"></el-option>
@@ -146,6 +146,7 @@
                 tableData: null,
                 list,
                 searchParam: {
+                    merchantId:''
                 },
                 addParam:{
                     agentId:'',
@@ -177,6 +178,7 @@
             getMerchantName(){ // 获取商户名称
                 this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId || this.addParam.agentId})).then((res)=>{
                     window.list.merchantName=res.data.value
+                    this.searchParam.merchantId = this.searchParam.merchantId && null
                 })
             },
             addInit(type){ // 创建成功后初始化数据

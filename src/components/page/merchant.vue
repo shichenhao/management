@@ -100,8 +100,8 @@
             </el-pagination>
         </div>
 
-        <el-dialog title="商家" :visible.sync="dialogFormVisible">
-            <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
+        <el-dialog title="商家" :visible.sync="dialogFormVisible" v-loading="addLoading">
+            <el-form :model="addParam" :rules="rules" ref="addParam">
                 <el-form-item label="所属代理商" :label-width="formLabelWidth" v-if="loginType">
                     <el-select v-model="addParam.agentId" placeholder="请选择" :disabled="isEdit">
                         <el-option v-for="item in list.agentNameAdd" :key="item.id" :label="item.name" :value="item.id"></el-option>
@@ -281,6 +281,7 @@
             getMerchantName(){ // 获取商户名称
                 this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId || this.addParam.agentId})).then((res)=>{
                     window.list.merchantName=res.data.value
+                    this.searchParam.merchantId = this.searchParam.merchantId && null
                 })
             },
             init(){

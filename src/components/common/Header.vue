@@ -30,7 +30,7 @@
                     {
                         icon: 'el-icon-info',
                         index: 'merchant',
-                        title: '商户管理家'
+                        title: '商户管理'
                     },
                     {
                         icon: 'el-icon-picture',

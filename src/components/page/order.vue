@@ -90,6 +90,9 @@
                 prop="consignerName"
                 width="120"
                 align="center">
+                <template slot-scope="scope">
+                    {{scope.row.consignerName + ' | ' + scope.row.consignerMobile}}
+                </template>
             </el-table-column>
             <el-table-column
                 label="发货地址"
@@ -102,6 +105,9 @@
                 prop="consigneeName"
                 width="100"
                 align="center">
+                <template slot-scope="scope">
+                    {{scope.row.consigneeName + ' | ' + scope.row.consigneeMobile}}
+                </template>
             </el-table-column>
             <el-table-column
                 label="收货地址"
@@ -162,8 +168,14 @@
                 align="center">
             </el-table-column>
             <el-table-column
-                label="板块服务商"
+                label="商家收益"
                 prop="merchantAmt"
+                width="100"
+                align="center">
+            </el-table-column>
+            <el-table-column
+                label="板块服务商"
+                prop="agentRateAmt"
                 width="100"
                 align="center">
             </el-table-column>
@@ -174,14 +186,6 @@
                 align="center">
                 <template slot-scope="scope">
                     在线支付
-                </template>
-            </el-table-column>
-            <el-table-column
-                label="付款状态"
-                width="100"
-                align="center">
-                <template slot-scope="scope">
-                    {{"状态".filtersOrders(scope.row.status)}}
                 </template>
             </el-table-column>
             <el-table-column
@@ -201,9 +205,15 @@
                 width="100"
                 align="center">
                 <template slot-scope="scope">
-                    <el-button type="text" v-if="scope.row.status === 0 || scope.row.status === 1" @click="cancelOrder(scope.row.id)" size="small">取消订单</el-button>
-                    <el-button type="text" v-if="scope.row.status === -1" @click="lookOrder(scope.row.cancelReason)" size="small">查看取消原因</el-button>
-                    <el-button type="text" v-if="scope.row.status === 2" @click="clearOrder('/express/manageClient/confirmExpressOrder',scope.row.id)" size="small">确认订单</el-button>
+                    <div>
+                        <el-button type="text" v-if="scope.row.status !== -1 && scope.row.status !== 4" @click="cancelOrder(scope.row.id)" size="small">取消订单</el-button>
+                    </div>
+                    <div>
+                        <el-button type="text" v-if="scope.row.status === -1" @click="lookOrder(scope.row.cancelReason)" size="small">查看取消原因</el-button>
+                    </div>
+                    <div>
+                        <el-button type="text" v-if="scope.row.status === 2" @click="clearOrder('/express/manageClient/confirmExpressOrder',scope.row.id)" size="small">确认订单</el-button>
+                    </div>
                 </template>
             </el-table-column>
         </el-table>
@@ -218,8 +228,8 @@
 
 
 
-        <el-dialog title="取消订单" :visible.sync="dialogFormVisible">
-            <el-form :model="addParam" :rules="rules" ref="addParam" v-loading="addLoading">
+        <el-dialog title="取消订单" :visible.sync="dialogFormVisible" v-loading="addLoading">
+            <el-form :model="addParam" :rules="rules" ref="addParam">
                 <el-form-item label="取消原因" prop="cancelReason" :label-width="formLabelWidth">
                     <el-input
                         type="textarea"
@@ -251,7 +261,9 @@
                 searchLoading:false,//搜索loading
                 tableData: null,
                 list,
-                searchParam: {},
+                searchParam: {
+                    merchantId:''
+                },
                 addParam:{},
                 multipleSelection: [],
                 pickerOptions2: {
@@ -293,6 +305,7 @@
             getMerchantName(){ // 获取商户名称
                 this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId || this.addParam.agentId})).then((res)=>{
                     window.list.merchantName=res.data.value
+                    this.searchParam.merchantId = this.searchParam.merchantId && null
                 })
             },
             indexMethod(index) {//序号
