@@ -11,12 +11,22 @@
             <el-form-item style="float: right;">
                 <el-button type="primary" icon="el-icon-plus" @click="handleEdit()">新建</el-button>
             </el-form-item>
+            <el-form style="padding: 20px 0">
+                <el-button type="primary" :disabled="!multipleSelection.length" icon="el-icon-news" @click="deleteOrder()">删除</el-button>
+            </el-form>
         </el-form>
         <el-table
             v-loading="searchLoading"
             :data="tableData && tableData.list || []"
             border
-            style="width: 100%">
+            style="width: 100%"
+            @selection-change="handleSelectionChange">
+            <el-table-column
+                type="selection"
+                width="55"
+                align="center"
+            >
+            </el-table-column>
             <el-table-column
                 label="编号"
                 width="60"
@@ -158,6 +168,7 @@
                 searchLoading:false,//搜索loading
                 tableData: null,
                 list,
+                multipleSelection: [],
                 searchParam: {
                     merchantId:''
                 },
@@ -260,6 +271,20 @@
                     this.searchLoading=false;
                     //console.log('返回结果',res.data)
                     this.tableData=res.data.value
+                })
+            },
+            handleSelectionChange(val) {//选中的数据
+                this.multipleSelection = val;
+            },
+            deleteOrder() {//删除
+                let ids = this.multipleSelection.map(item=> item.id).toString()
+                this.$axios.post('/express/manageClient/batchRemoveExpressPrice', addToken({ids})).then((res)=>{
+                    if(res.data.success){
+                        this.$message.success('操作成功！');
+                        this.onSearch()
+                    }
+                }).catch((error)=>{
+                    this.$message.error(error.response.data.message);
                 })
             },
             handleEdit(id) {//修改

@@ -121,7 +121,7 @@
                         上传图片
                         <input class="file" name="file" type="file" accept="image/png,image/gif,image/jpeg" @change="update"/>
                     </label>
-                    <img width="100" height="100" :src="addParam.identityImg" v-if="isEdit">
+                    <img width="100" height="100" :src="addParam.identityImg" v-if="addParam.identityImg">
                 </el-form-item>
                 <el-form-item label="佣金抽取方式" :label-width="formLabelWidth">
                     <el-select v-model="addParam.commissionType">

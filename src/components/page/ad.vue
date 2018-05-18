@@ -45,6 +45,14 @@
                 align="center">
             </el-table-column>
             <el-table-column
+                label="状态"
+                width="100"
+                align="center">
+                <template slot-scope="scope">
+                    {{"状态".filtersSatus(scope.row.state)}}
+                </template>
+            </el-table-column>
+            <el-table-column
                 label="操作"
                 min-width="60"
                 align="center">
@@ -74,9 +82,17 @@
                         上传图片
                         <input class="file" name="file" type="file" accept="image/png,image/gif,image/jpeg" @change="update"/>
                     </label>
+                    <div class="bannerImg">
+                        <img :src="addParam.imgUrl" width="100" v-if="addParam.imgUrl">
+                    </div>
                 </el-form-item>
                 <el-form-item label="跳转地址" prop="gotoUrl" :label-width="formLabelWidth">
                     <el-input v-model="addParam.gotoUrl"></el-input>
+                </el-form-item>
+                <el-form-item label="状态" :label-width="formLabelWidth">
+                    <el-select v-model="addParam.state" placeholder="请选择" >
+                        <el-option v-for="item in list.status" :key="item.val" :label="item.name" :value="item.val"></el-option>
+                    </el-select>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -100,7 +116,9 @@
                 list,
                 searchParam: {
                 },
-                addParam:{},
+                addParam:{
+                    state:1
+                },
                 rules: {
                     agentId: [
                         { required: true, message: '请选择代理商', trigger: 'change' }
@@ -115,7 +133,9 @@
         methods: {
             addInit(type){ // 创建成功后初始化数据
                 this.dialogFormVisible=type || false;
-                this.addParam={};
+                this.addParam={
+                    state:1
+                };
             },
             indexMethod(index) {//序号
                 return index + 1;
@@ -134,6 +154,9 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.addLoading=true;
+                        if(this.addParam.gotoUrl === null){
+                            delete this.addParam.gotoUrl;
+                        }
                         console.log(this.addParam);
                         this.$axios.post("/express/manageClient/createOrMergeExpressBanner",addToken(this.addParam)).then((res)=>{
                             this.addLoading=false;
