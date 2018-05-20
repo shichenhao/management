@@ -149,6 +149,13 @@ window.list={
         name:'停用',
         val:0
     }],
+    operatingStatus:[{
+        name:'营业',
+        val:0
+    }, {
+        name:'暂停营业',
+        val:1
+    }],
     orderStatus:[{
         name:'已取消',
         val:-1

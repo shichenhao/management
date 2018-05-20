@@ -246,7 +246,7 @@
                                 });
                                 this.addInit();
                                 //if(this.addParam.id){
-                                    this.onSearch();
+                                    this.onSearch(this.searchParam.start/20+1);
                                 //}
                             }else{
                                 this.$message({

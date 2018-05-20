@@ -181,6 +181,11 @@
                         <el-option v-for="item in list.status" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="营业状态" :label-width="formLabelWidth">
+                    <el-select v-model="addParam.operatingStatus" placeholder="请选择" >
+                        <el-option v-for="item in list.operatingStatus" :key="item.val" :label="item.name" :value="item.val"></el-option>
+                    </el-select>
+                </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -273,6 +278,7 @@
                     accountType:1,
                     hasBinding:1,
                     state:1,
+                    operatingStatus:0
                 },
                 formLabelWidth: '120px'
             }
@@ -307,6 +313,7 @@
                     accountType:1,
                     hasBinding:1,
                     state:1,
+                    operatingStatus:0,
                 }
 
                 if(!loginType){
@@ -353,7 +360,7 @@
                                 });
                                 this.addInit()
                                 //if(this.addParam.id){
-                                    this.onSearch();
+                                this.onSearch(this.searchParam.start/20+1);
                                 //}
                             }else{
                                 this.$message({

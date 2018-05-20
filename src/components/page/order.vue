@@ -337,7 +337,7 @@
                 this.$axios.post(url, addToken(id ? { id } : { ids })).then((res)=>{
                   if(res.data.success){
                     this.$message.success('操作成功！');
-                    this.onSearch()
+                    this.onSearch(this.searchParam.start/20+1);
                   }
                 }).catch((error)=>{
                     this.$message.error(error.response.data.message);
