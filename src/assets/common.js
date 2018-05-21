@@ -46,6 +46,18 @@ String.prototype.filtersSatus=function(state){
     }
     return text
 }
+String.prototype.operatingStatus=function(state){
+    let text=''
+    switch (state){
+        case 0:
+            text='营业中'
+            break
+        case 1:
+            text='暂停营业'
+            break
+    }
+    return text
+}
 String.prototype.filtersHasBinding=function(state){
     let text=''
     switch (state){

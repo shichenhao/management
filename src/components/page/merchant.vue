@@ -7,7 +7,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-select v-model="searchParam.name" placeholder="商户名称">
+                <el-select v-model="searchParam.merchantId" placeholder="商户名称">
                     <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
                 </el-select>
             </el-form-item>
@@ -81,6 +81,15 @@
                 label="更新时间"
                 min-width="200"
                 align="center">
+            </el-table-column>
+            <el-table-column
+                prop="operatingStatus"
+                label="营业状态"
+                min-width="200"
+                align="center">
+                <template slot-scope="scope">
+                    {{"状态".operatingStatus(scope.row.operatingStatus)}}
+                </template>
             </el-table-column>
             <el-table-column
                 label="操作"
@@ -237,7 +246,9 @@
                 searchLoading:false,//搜索loading
                 tableData: null,
                 list,
-                searchParam: {},
+                searchParam: {
+                    merchantId:''
+                },
                 rules: {
                     loginName: [
                         { required: true, message: '请填写登录账号', trigger: 'change' }
