@@ -130,10 +130,14 @@
     export default {
         data() {
             let dateValidata = (rule, value, callback) => {
-                let reg=/^(([0-1][0-9]|[2][0-3]):([0-6][0-9])-([0-1][0-9]|[2][0-3]):([0-6][0-9]),?)/;
+                let reg=/^([0-1][0-9]|[2][0-3]):([0-5][0-9])-([0-1][0-9]|[2][0-3]):([0-5][0-9])$/;
+                let values = value.split(',')
                 if(!value || value == ''){
                     callback(new Error('请填写取件时段'));
-                }else if(!reg.test(value)){
+                }else if(values.some((item)=>{
+                        console.log(reg.test(item),item)
+                        return !reg.test(item)
+                    })){
                     callback(new Error('请填写正确的取件时间段如:09:00-10:00多个请用逗号隔开如09:00-10:00,13:00-14:00'));
                 }else if(value.split(',').length>8){
                     callback(new Error('取件时间最多只可设置8个时间段'));
