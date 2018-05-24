@@ -1,13 +1,14 @@
 <template>
     <div>
-        <el-form :inline="true" :model="searchParam" class="demo-form-inline">
-            <el-form-item>
-                <el-select v-if="loginType" v-model="searchParam.agentId" placeholder="代理商名称" @change="getMerchantName()">
+        <el-form :inline="true" :model="searchParam" class="demo-form-inline" ref="searchParam">
+            <el-form-item prop="agentId">
+                <el-select v-if="loginType" v-model="searchParam.agentId" placeholder="代理商名称">
                     <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="onSearch()">查询</el-button>
+                <el-button icon="el-icon-refresh" @click="resetForm('searchParam')">重置</el-button>
             </el-form-item>
             <el-form-item style="float: right;">
                 <el-button type="primary" icon="el-icon-plus" @click="handleEdit()">新建</el-button>
@@ -131,6 +132,9 @@
             }
         },
         methods: {
+            resetForm(formName) { //重置
+                this.$refs[formName].resetFields();
+            },
             addInit(type){ // 创建成功后初始化数据
                 this.dialogFormVisible=type || false;
                 this.addParam={
@@ -143,6 +147,9 @@
             onSearch(start) {//搜索
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
+                if(!this.searchParam.agentId){
+                    delete  this.searchParam.agentId;
+                }
                 //console.log('搜索条件',this.searchParam);
                 this.$axios.post("/express/manageClient/findExpressBannerListByPage",addToken(this.searchParam)).then((res)=>{
                     this.searchLoading=false;

@@ -1,23 +1,24 @@
 <template>
     <div>
-        <el-form :inline="true" :model="searchParam" class="demo-form-inline">
-            <el-form-item>
+        <el-form :inline="true" :model="searchParam" class="demo-form-inline" ref="searchParam">
+            <el-form-item prop="agentId">
                 <el-select v-if="loginType" v-model="searchParam.agentId" placeholder="代理商名称" @change="getMerchantName()">
                     <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="merchantId">
                 <el-select v-model="searchParam.merchantId" placeholder="商户名称">
                     <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="state">
                 <el-select v-model="searchParam.state" placeholder="账户状态">
                     <el-option v-for="item in list.status" :key="item.val" :label="item.name" :value="item.val"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="onSearch()">查询</el-button>
+                <el-button icon="el-icon-refresh" @click="resetForm('searchParam')">重置</el-button>
             </el-form-item>
             <el-form-item style="float: right;">
                 <el-button type="primary" icon="el-icon-plus" @click="handleEdit()">新建</el-button>
@@ -125,6 +126,9 @@
                 <el-form-item label="商户名称" prop="name" :label-width="formLabelWidth">
                     <el-input v-model="addParam.name" :disabled="isEdit"></el-input>
                 </el-form-item>
+                <el-form-item label="客服电话" prop="phone" :label-width="formLabelWidth">
+                    <el-input v-model="addParam.phone" :disabled="isEdit"></el-input>
+                </el-form-item>
                 <el-form-item label="标识" :label-width="formLabelWidth">
                     <label class="adFile" v-if="!isEdit">
                         上传图片
@@ -151,7 +155,7 @@
                 <el-form-item label="账户名称" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
                     <el-input v-model="addParam.accountName"></el-input>
                 </el-form-item>
-                <el-form-item label="手机号" prop="mobile" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
+                <el-form-item label="联系方式" prop="mobile" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
                     <el-input v-model="addParam.mobile"></el-input>
                 </el-form-item>
                 <el-form-item label="地址" prop="address" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
@@ -208,11 +212,21 @@
     export default {
         data() {
             let telValidata = (rule, value, callback) => {
-                let reg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+                let reg = /(^(0[0-9]{2,3}\-)?([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$)|(^((\(\d{3}\))|(\d{3}\-))?(1[358]\d{9})$)/;
                 if(!value || value == ''){
-                    callback(new Error('请输入手机号'));
-                }else if(value.length!=11 || !reg.test(value)){
-                    callback(new Error('请输入正确的手机号'));
+                    callback(new Error('请输入联系方式'));
+                }else if(!reg.test(value)){
+                    callback(new Error('请输入正确的联系方式'));
+                }else{
+                    callback();
+                }
+            };
+            let telValidata2 = (rule, value, callback) => {
+                let reg = /(^(0[0-9]{2,3}\-)?([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$)|(^((\(\d{3}\))|(\d{3}\-))?(1[358]\d{9})$)/;
+                if(!value || value == ''){
+                    callback(new Error('请输入客服电话'));
+                }else if(!reg.test(value)){
+                    callback(new Error('请输入正确的客服电话'));
                 }else{
                     callback();
                 }
@@ -268,6 +282,9 @@
                     mobile: [
                         { required: true, validator: telValidata,  trigger: 'blur' }
                     ],
+                    phone: [
+                        { required: true, validator: telValidata2,  trigger: 'blur' }
+                    ],
                     address: [
                         { required: true, message: '请填写地址', trigger: 'change' }
                     ],
@@ -295,6 +312,9 @@
             }
         },
         methods: {
+            resetForm(formName) { //重置
+                this.$refs[formName].resetFields();
+            },
             getMerchantName(){ // 获取商户名称
                 this.$axios.post('/express/manageClient/findExpressMerchantDTOList',addToken({agentId:this.searchParam.agentId || this.addParam.agentId})).then((res)=>{
                     window.list.merchantName=res.data.value
@@ -309,6 +329,9 @@
             onSearch(start) {//搜索
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
+                if(!this.searchParam.agentId){
+                    delete  this.searchParam.agentId;
+                }
                 //console.log('搜索条件',this.searchParam);
                 this.$axios.post('/express/manageClient/findExpressMerchantList',addToken(this.searchParam)).then((res)=>{
                     this.searchLoading=false

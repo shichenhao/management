@@ -13,6 +13,11 @@
             return {
                 items: [
                     {
+                        icon: 'el-icon-info',
+                        index: 'merchant',
+                        title: '商户管理'
+                    },
+                    {
                         icon: 'el-icon-setting',
                         index: 'price',
                         title: '价格设置'
@@ -23,19 +28,14 @@
                         title: '期望上门时间'
                     },
                     {
-                        icon: 'el-icon-tickets',
-                        index: 'order',
-                        title: '订单管理'
-                    },
-                    {
-                        icon: 'el-icon-info',
-                        index: 'merchant',
-                        title: '商户管理'
-                    },
-                    {
                         icon: 'el-icon-picture',
                         index: 'ad',
                         title: '广告'
+                    },
+                    {
+                        icon: 'el-icon-tickets',
+                        index: 'order',
+                        title: '订单管理'
                     },
                 ]
             }

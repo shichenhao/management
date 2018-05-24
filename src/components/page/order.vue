@@ -1,33 +1,33 @@
 <template>
     <div>
-        <el-form :inline="true" :model="searchParam" class="demo-form-inline">
-            <el-form-item>
+        <el-form :inline="true" :model="searchParam" class="demo-form-inline" ref="searchParam">
+            <el-form-item prop="agentId">
                 <el-select v-if="loginType" v-model="searchParam.agentId" placeholder="所属代理商" @change="getMerchantName()">
                     <el-option v-for="item in list.agentName" :key="item.agentId" :label="item.name" :value="item.agentId"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="merchantId">
                 <el-select v-model="searchParam.merchantId" placeholder="所属商家">
                     <el-option v-for="item in list.merchantName" :key="item.id" :label="item.name" :value="item.id"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="orderId">
                 <el-input v-model="searchParam.orderId" placeholder="订单号"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="consignerMobile">
                 <el-input v-model="searchParam.consignerMobile" placeholder="发货人手机号"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="status">
                 <el-select v-model="searchParam.status" placeholder="订单状态">
                     <el-option v-for="item in list.orderStatus" :key="item.val" :label="item.name" :value="item.val"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="paymentState">
                 <el-select v-model="searchParam.paymentState" placeholder="付款状态">
                     <el-option v-for="item in list.hasBinding" :key="item.val" :label="item.name" :value="item.val"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="data">
                 <el-date-picker
                     v-model="searchParam.data"
                     type="daterange"
@@ -42,6 +42,8 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="onSearch()">查询</el-button>
+                <el-button type="primary" icon="el-icon-menu" @click="calAll()">统计</el-button>
+                <el-button icon="el-icon-refresh" @click="resetForm('searchParam')">重置</el-button>
             </el-form-item>
         </el-form>
         <el-form style="padding: 0 0 20px">
@@ -99,6 +101,9 @@
                 prop="consignerAddress"
                 width="120"
                 align="center">
+                <template slot-scope="scope">
+                    {{scope.row.consignerAddress + ' | ' + scope.row.consignerHouseNumber}}
+                </template>
             </el-table-column>
             <el-table-column
                 label="收货人"
@@ -114,6 +119,9 @@
                 prop="consigneeAddress"
                 width="120"
                 align="center">
+                <template slot-scope="scope">
+                    {{scope.row.consigneeAddress + ' | ' + scope.row.consigneeHouseNumber}}
+                </template>
             </el-table-column>
             <el-table-column
                 label="取件时间"
@@ -246,6 +254,52 @@
         </el-dialog>
 
 
+        <el-dialog title="统计" :visible.sync="callType" v-loading="addLoading">
+
+            <el-table
+                :data="tableDataPop || []"
+                border
+                style="width: 100%">
+                <el-table-column
+                    label="订单数量"
+                    prop="total"
+                    width="160"
+                    align="center">
+                </el-table-column>
+                <el-table-column
+                    label="系统收益"
+                    prop="sysRateAmtSum"
+                    width="100"
+                    align="center">
+                </el-table-column>
+                <el-table-column
+                    label="省级代理商收益"
+                    prop="provinceAgentRateAmtSum"
+                    width="100"
+                    align="center">
+                </el-table-column>
+                <el-table-column
+                    label="合伙人收益"
+                    prop="partnerAgentRateAmtSum"
+                    width="100"
+                    align="center">
+                </el-table-column>
+                <el-table-column
+                    label="板块服务商"
+                    prop="agentRateAmtSum"
+                    width="100"
+                    align="center">
+                </el-table-column>
+                <el-table-column
+                    label="商家收益"
+                    prop="merchantAmtSum"
+                    width="100"
+                    align="center">
+                </el-table-column>
+            </el-table>
+        </el-dialog>
+
+
 
 
     </div>
@@ -257,9 +311,11 @@
             return {
                 loginType:sessionStorage.getItem('loginType')==1 ? true : false,//登录权限 0 代理商 1 管理员
                 dialogFormVisible: false,//新增修改弹窗
+                callType: false,//统计弹窗
                 addLoading:false,//添加loading
                 searchLoading:false,//搜索loading
                 tableData: null,
+                tableDataPop: null,
                 list,
                 searchParam: {
                     merchantId:''
@@ -318,6 +374,9 @@
             onSearch(start) {//搜索
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
+                if(!this.searchParam.agentId){
+                    delete  this.searchParam.agentId;
+                }
                 if(this.searchParam.data){
                     this.searchParam.startTime=this.searchParam.data[0]
                     this.searchParam.endTime=this.searchParam.data[1]
@@ -342,6 +401,26 @@
                 }).catch((error)=>{
                     this.$message.error(error.response.data.message);
                 })
+            },
+            calAll() {//统计
+                if(!this.searchParam.agentId){
+                    delete  this.searchParam.agentId;
+                }
+                if(this.searchParam.data){
+                    this.searchParam.startTime=this.searchParam.data[0]
+                    this.searchParam.endTime=this.searchParam.data[1]
+                    delete this.searchParam.data
+                }
+                this.$axios.post('/express/manageClient/findExpressOrderAgentAmt',addToken(this.searchParam)).then((res)=>{
+                    let arr =[]
+                    arr.push(res.data.value)
+                    this.callType=true
+                    //console.log(res.data.value)
+                    this.tableDataPop=arr
+                })
+            },
+            resetForm(formName) { //重置
+                this.$refs[formName].resetFields();
             },
             cancelOrder(id) {//取消订单弹窗
                 this.dialogFormVisible = true;
