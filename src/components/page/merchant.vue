@@ -127,7 +127,7 @@
                     <el-input v-model="addParam.name" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="客服电话" prop="phone" :label-width="formLabelWidth">
-                    <el-input v-model="addParam.phone" :disabled="isEdit"></el-input>
+                    <el-input v-model="addParam.phone"></el-input>
                 </el-form-item>
                 <el-form-item label="标识" :label-width="formLabelWidth">
                     <label class="adFile" v-if="!isEdit">
@@ -152,42 +152,42 @@
                         <el-option v-for="item in list.hasBinding" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="账户名称" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
-                    <el-input v-model="addParam.accountName"></el-input>
+                <el-form-item label="账户名称" prop="accountName" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
+                    <el-input v-model="addParam.accountName" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="联系方式" prop="mobile" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
-                    <el-input v-model="addParam.mobile"></el-input>
+                    <el-input v-model="addParam.mobile" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="地址" prop="address" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
-                    <select class="sch_select" v-model="addParam.province" placeholder="省" @change="handleProvince('city','province')" style="width: 120px;float: left;">
+                    <select class="sch_select" v-model="addParam.province" placeholder="省" :disabled="isEdit" :class="{disabled : isEdit}" @change="handleProvince('city','province')" style="width: 120px;float: left;">
                         <option v-for="item in list.province" :key="item.id" :value="item.id">{{item.name}}</option>
                     </select>
-                    <select class="sch_select" v-model="addParam.city" placeholder="市" @change="handleProvince('district','city')" style="width: 120px;float: left;margin:0 10px 15px;">
+                    <select class="sch_select" v-model="addParam.city" placeholder="市" :disabled="isEdit" :class="{disabled : isEdit}" @change="handleProvince('district','city')" style="width: 120px;float: left;margin:0 10px 15px;">
                         <option v-for="item in list.city" :key="item.id" :value="item.id">{{item.name}}</option>
                     </select>
-                    <select class="sch_select" v-model="addParam.district" placeholder="区" style="width: 120px;float: left;">
+                    <select class="sch_select" v-model="addParam.district" :disabled="isEdit" :class="{disabled : isEdit}" placeholder="区" style="width: 120px;float: left;">
                         <option v-for="item in list.district" :key="item.id" :value="item.id">{{item.name}}</option>
                     </select>
-                    <el-input v-model="addParam.address"></el-input>
+                    <el-input v-model="addParam.address" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="账户类型" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
-                    <el-select v-model="addParam.accountType">
+                    <el-select v-model="addParam.accountType" :disabled="isEdit">
                         <el-option v-for="item in list.accountType" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="银行名称" prop="bankName" :label-width="formLabelWidth" v-if="!addParam.hasBinding && addParam.accountType==1">
-                    <el-input v-model="addParam.bankName"></el-input>
+                    <el-input v-model="addParam.bankName" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="银行名称" prop="bankName" :label-width="formLabelWidth" v-if="!addParam.hasBinding && addParam.accountType==0">
-                    <el-select v-model="addParam.bankName">
+                    <el-select v-model="addParam.bankName" :disabled="isEdit">
                         <el-option v-for="item in list.bankName" :key="item.val" :label="item.name" :value="item.val"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="银行卡号" prop="bankCard" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
-                    <el-input v-model="addParam.bankCard"></el-input>
+                    <el-input v-model="addParam.bankCard" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="开户人" prop="bankPerson" :label-width="formLabelWidth" v-if="!addParam.hasBinding">
-                    <el-input v-model="addParam.bankPerson"></el-input>
+                    <el-input v-model="addParam.bankPerson" :disabled="isEdit"></el-input>
                 </el-form-item>
                 <el-form-item label="状态" :label-width="formLabelWidth">
                     <el-select v-model="addParam.state" placeholder="请选择" >
@@ -288,6 +288,9 @@
                     address: [
                         { required: true, message: '请填写地址', trigger: 'change' }
                     ],
+                    accountName: [
+                        { required: true, message: '请填写账户名称', trigger: 'change' }
+                    ],
                     bankName: [
                         { required: true, message: '请填写银行名称', trigger: 'change' }
                     ],
@@ -330,7 +333,10 @@
                 this.searchLoading=true;
                 this.searchParam.start=((start-1)*20) || 0
                 if(!this.searchParam.agentId){
-                    delete  this.searchParam.agentId;
+                    delete this.searchParam.agentId;
+                }
+                if(!this.searchParam.state){
+                    delete this.searchParam.state;
                 }
                 //console.log('搜索条件',this.searchParam);
                 this.$axios.post('/express/manageClient/findExpressMerchantList',addToken(this.searchParam)).then((res)=>{
@@ -498,5 +504,9 @@
         height: 38px;
         color: #606266;
         padding: 0 10px;
+    }
+    .disabled{
+        color: #c0c4cc;
+        background: #f5f7fa;
     }
 </style>

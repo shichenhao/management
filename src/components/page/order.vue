@@ -254,7 +254,7 @@
         </el-dialog>
 
 
-        <el-dialog title="统计" :visible.sync="callType" v-loading="addLoading">
+        <el-dialog title="统计" :visible.sync="callType" v-loading="addLoading" width="800px">
 
             <el-table
                 :data="tableDataPop || []"
@@ -275,7 +275,7 @@
                 <el-table-column
                     label="省级代理商收益"
                     prop="provinceAgentRateAmtSum"
-                    width="100"
+                    width="199"
                     align="center">
                 </el-table-column>
                 <el-table-column
@@ -376,6 +376,21 @@
                 this.searchParam.start=((start-1)*20) || 0
                 if(!this.searchParam.agentId){
                     delete  this.searchParam.agentId;
+                }
+                if(!this.searchParam.orderId){
+                    delete  this.searchParam.orderId;
+                }
+                if(!this.searchParam.consignerMobile){
+                    delete  this.searchParam.consignerMobile;
+                }
+                if(!this.searchParam.status){
+                    delete  this.searchParam.status;
+                }
+                if(!this.searchParam.paymentState){
+                    delete  this.searchParam.paymentState;
+                }
+                if(!this.searchParam.data){
+                    delete  this.searchParam.data;
                 }
                 if(this.searchParam.data){
                     this.searchParam.startTime=this.searchParam.data[0]
